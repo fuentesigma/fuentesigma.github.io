@@ -269,13 +269,9 @@ footer .row { row-gap: 0.5rem; }
    per-entry accent colour.
    ================================================================ */
 
-/* ---------- per-entry accent ----------
-   Set data-entry on <html> in an entry page to recolour it. The rest
-   of the palette is fixed. Add one rule per new entry. */
-
-html[data-entry="psidm"] { --accent: #3bb6f8; }
-html[data-entry="lion"]   { --accent: #b3689e; }
-html[data-entry="stokes"] { --accent: #2f8f80; }
+/* ---------- accent ----------
+   One accent for the whole site, defined once in :root above. Entry
+   pages do not recolour themselves. */
 
 /* ---------- site navigation ----------
    .bar .home is the link back to the index, present on every entry. */
@@ -292,43 +288,23 @@ html[data-entry="stokes"] { --accent: #2f8f80; }
 .site-hero .lede { font-size: clamp(1.05rem, 1.8vw, 1.25rem); line-height: 1.45; color: var(--ink-2);
                    max-width: var(--measure); margin: 0; }
 
-/* One entry per row. The rail carries the year and the field, the
-   body carries the title and the abstract. The whole row is a link. */
+/* One entry per row. Title, then the year, then the abstract. The whole
+   row is a link. */
 
 .entries { list-style: none; margin: 0; padding: 0; }
 .entries > li { border-bottom: 1px solid var(--rule); }
 .entries > li:first-child { border-top: 1px solid var(--ink); }
 
-.entry {
-  display: grid;
-  grid-template-columns: var(--rail) minmax(0, 1fr);
-  gap: var(--gap);
-  padding-block: 1.8rem;
-  text-decoration: none;
-  align-items: start;
-}
-@media (max-width: 860px) {
-  .entry { grid-template-columns: minmax(0, 1fr); gap: 0.7rem; }
-}
+.entry { display: block; padding-block: 1.8rem; text-decoration: none; }
 
-.entry .meta { font: 500 11px/1.6 var(--mono); letter-spacing: 0.06em; text-transform: uppercase;
-               color: var(--muted); }
-.entry .meta .year { display: block; color: var(--ink); font-size: 13px; }
-.entry h2 { margin: 0 0 0.5rem; font-size: clamp(1.15rem, 2.4vw, 1.5rem); font-weight: 500;
+.entry h2 { margin: 0 0 0.45rem; font-size: clamp(1.15rem, 2.4vw, 1.5rem); font-weight: 500;
             letter-spacing: -0.02em; line-height: 1.15; border: 0; padding: 0; }
+.entry .year { margin-bottom: 0.8rem; font: 500 11px/1.6 var(--mono); letter-spacing: 0.06em;
+               text-transform: uppercase; color: var(--muted); }
 .entry p { margin: 0; max-width: var(--measure); color: var(--ink-2); font-size: 14.5px; }
-.entry .status { display: inline-block; margin-top: 0.7rem; font: 500 10.5px/1 var(--mono);
-                 letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
 
 .entry:hover h2 { color: var(--accent); }
-.entry:hover .meta .year { color: var(--accent); }
-
-/* Give each row on the index its own accent while hovering, so the
-   colour matches the entry it leads to. */
-.entries > li[data-entry="psidm"] { --accent: #3bb6f8; }
-.entries > li[data-entry="lion"]   { --accent: #b3689e; }
-.entries > li[data-entry="stokes"] { --accent: #2f8f80; }
 
 /* An entry that has no page yet is listed without a link. */
 .entry.soon { opacity: 0.55; cursor: default; }
-.entry.soon:hover h2, .entry.soon:hover .meta .year { color: inherit; }
+.entry.soon:hover h2 { color: inherit; }
