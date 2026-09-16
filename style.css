@@ -274,7 +274,8 @@ footer .row { row-gap: 0.5rem; }
    of the palette is fixed. Add one rule per new entry. */
 
 html[data-entry="psidm"] { --accent: #3bb6f8; }
-html[data-entry="lion"]  { --accent: #b3689e; }
+html[data-entry="lion"]   { --accent: #b3689e; }
+html[data-entry="stokes"] { --accent: #2f8f80; }
 
 /* ---------- site navigation ----------
    .bar .home is the link back to the index, present on every entry. */
@@ -285,7 +286,7 @@ html[data-entry="lion"]  { --accent: #b3689e; }
 
 /* ---------- landing page ---------- */
 
-.site-hero { padding-block: clamp(3rem, 10vw, 7rem) 2.5rem; border-bottom: 1px solid var(--ink); }
+.site-hero { padding-block: clamp(3rem, 10vw, 7rem) 1rem; }
 .site-hero h1 { margin: 0.2rem 0 1rem; font-size: clamp(1.9rem, 5vw, 3.1rem); font-weight: 500;
                 letter-spacing: -0.03em; line-height: 1.04; }
 .site-hero .lede { font-size: clamp(1.05rem, 1.8vw, 1.25rem); line-height: 1.45; color: var(--ink-2);
@@ -325,7 +326,8 @@ html[data-entry="lion"]  { --accent: #b3689e; }
 /* Give each row on the index its own accent while hovering, so the
    colour matches the entry it leads to. */
 .entries > li[data-entry="psidm"] { --accent: #3bb6f8; }
-.entries > li[data-entry="lion"]  { --accent: #b3689e; }
+.entries > li[data-entry="lion"]   { --accent: #b3689e; }
+.entries > li[data-entry="stokes"] { --accent: #2f8f80; }
 
 /* An entry that has no page yet is listed without a link. */
 .entry.soon { opacity: 0.55; cursor: default; }
