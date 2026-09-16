@@ -94,26 +94,26 @@
         \[ H(a) = H_0\,E(a), \qquad E(a) = \sqrt{\Omega_{m0}\,a^{-3} + \Omega_{\Lambda 0}} . \]
       </div>
 
-      <p>The code uses units that remove every physical constant from the equations. Time is measured by \(\dd\tau = \dd t/(a^2 T_0)\) and lengths by \(L_0\), and the mean density is normalised to unity, with</p>
+      <p> To have units that remove every physical constant from the equations,  time is measured by \(\dd\tau = \dd t/(a^2 T_0)\) and lengths by \(L_0\), and the mean density is normalised to unity, with</p>
       <div class="eq"><span class="tag">eq. 3</span>
         \[ T_0 = \Big(\tfrac{3}{2}H_0^2\,\Omega_{m0}\Big)^{-1/2}, \qquad
            L_0 = \sqrt{\hbar\,T_0/m}, \qquad
            V = \frac{a\,m\,T_0}{\hbar}\,\Phi, \qquad \avg{|\psi|^2} = 1 . \]
       </div>
-      <p>Eq. 1 then takes the form integrated by the code.</p>
+      <p>Eq. 1 then takes the form:</p>
       <div class="eq"><span class="tag">eq. 4</span>
         \[ \ii\,\frac{\partial\psi}{\partial\tau} = -\frac12\lap\psi + a\,V\,\psi, \qquad
            \lap V = |\psi|^2 - 1, \qquad
            \frac{\dd a}{\dd\tau} = \frac{a^3\,E(a)}{\sqrt{3\,\Omega_{m0}/2}} . \]
       </div>
-      <p>Cosmology enters the dynamics only through the factor \(a\) in front of the potential and through the evolution of \(a(\tau)\). The test bench confirms that both coefficients in eq. 4 equal one (§04). For \(m = 8\times10^{-23}\,\mathrm{eV}\), \(H_0 = 70\,\mathrm{km\,s^{-1}\,Mpc^{-1}}\) and \(\Omega_{m0}=0.27\), the code length is \(L_0 = 23.2\) comoving kpc and the code time is \(T_0 = 21.9\) Gyr.</p>
+      <p>Cosmology enters the dynamics only through the factor \(a\) in front of the potential and through the evolution of \(a(\tau)\). For \(m = 8\times10^{-23}\,\mathrm{eV}\), \(H_0 = 70\,\mathrm{km\,s^{-1}\,Mpc^{-1}}\) and \(\Omega_{m0}=0.27\), the (simulation) comoving length is \(L_0 = 23.2\) kpc and the time is \(T_0 = 21.9\) Gyr.</p>
 
       <p>The Madelung substitution \(\psi = \sqrt{\rho}\,e^{\ii S}\) maps eq. 4 onto a continuity equation and an Euler equation with an additional quantum pressure term.</p>
       <div class="eq"><span class="tag">eq. 5</span>
         \[ \partial_\tau\rho + \nabla\!\cdot(\rho\,\nabla S) = 0, \qquad
            \partial_\tau \nabla S + (\nabla S\cdot\nabla)\nabla S = -a\,\nabla V + \nabla\!\left(\frac{\lap\sqrt\rho}{2\sqrt\rho}\right). \]
       </div>
-      <p>Linearising eq. 5 about a homogeneous background gives the Jeans wavenumber \(k_J = (16\pi G\rho\, m^2/\hbar^2)^{1/4}\). Modes with \(k &lt; k_J\) grow, and modes with \(k &gt; k_J\) oscillate. The resulting suppression of small-scale power is imposed in the initial conditions (§03).</p>
+      <p>Linearising eq. 5 about a homogeneous background gives the Jeans wavenumber \(k_J = (16\pi G\rho\, m^2/\hbar^2)^{1/4}\). Modes with \(k &lt; k_J\) grow, and modes with \(k &gt; k_J\) oscillate. The resulting suppression of small-scale power is imposed in the initial conditions (see §03).</p>
 
       <p>The evolution conserves the mass \(M=\int|\psi|^2\) and, in a static box, the energy \(E = \int \big(\tfrac12|\nabla\psi|^2 + \tfrac12 V|\psi|^2\big)\). The equations are also invariant under the scaling</p>
       <div class="eq"><span class="tag">eq. 6</span>
@@ -153,11 +153,11 @@
 
       <p>On the periodic root grid the drift is exact in Fourier space for any \(\Delta\tau\), and the Poisson equation reduces to a division.</p>
       <div class="eq"><span class="tag">eq. 8</span>
-        \[ \hat V(\mathbf{k}) = -\frac{\widehat{\rho - \bar\rho}(\mathbf{k})}{k^2}, \qquad \hat V(\mathbf{0}) = 0 . \]
+        \[ \hat V(\mathbf{k}) = -\frac{\widehat{\rho - \bar\rho}(\mathbf{k})}{k^2}, \qquad \hat V(\mathbf{0}) = 0 , \]
       </div>
-      <p>The \(k=0\) mode is set to zero. In a periodic volume the mean density is the cosmological background, whose effect is already contained in \(a(\tau)\).</p>
+      <p>where \(k=0\) mode is set to zero. In a periodic volume the mean density is the cosmological background, whose effect is already contained in \(a(\tau)\).</p>
 
-      <p>Refined patches are subdomains of a larger grid and are not periodic. A Fourier transform on a patch would couple opposite faces. The kinetic step on patches therefore uses the 7-point Laplacian, with Dirichlet ghost cells interpolated from the parent level, advanced with the Crank–Nicolson scheme</p>
+      <p> At this point it is convenient to clarify that refined patches are subdomains of a larger grid and are not periodic, and a Fourier transform on a patch would couple opposite faces. The kinetic step on patches therefore uses the 7-point Laplacian, with Dirichlet ghost cells interpolated from the parent level, advanced with the Crank–Nicolson scheme</p>
       <div class="eq"><span class="tag">eq. 9</span>
         \[ \Big(1 + \tfrac{\ii\Delta\tau}{2} H_h\Big)\psi^{n+1} = \Big(1 - \tfrac{\ii\Delta\tau}{2} H_h\Big)\psi^{n},
            \qquad H_h\psi_{ijk} = -\frac{1}{2\Delta x^2}\Big(\textstyle\sum_{\rm 6\,nb}\psi - 6\,\psi_{ijk}\Big). \]
@@ -166,7 +166,7 @@
       <div class="eq"><span class="tag">eq. 10</span>
         \[ (1+6\alpha)\,\psi^{n+1}_{ijk} - \alpha\!\sum_{\rm nb}\psi^{n+1} \;=\; (1-6\alpha)\,\psi^{n}_{ijk} + \alpha\!\sum_{\rm nb}\psi^{n} . \]
       </div>
-      <p>The implicit system is solved by red–black Gauss–Seidel iteration, implemented on the GPU as two masked array updates. Over-relaxation with \(\omega &gt; 1\) diverges for this complex, weakly diagonally dominant system, and the code uses \(\omega = 1\).</p>
+      <p>The implicit system is solved by red–black Gauss–Seidel iteration, implemented on the GPU as two masked array updates. Over-relaxation with \(\omega &gt; 1\) diverges for this complex, weakly diagonally dominant system, and the simulation I use \(\omega = 1\).</p>
 
       <div class="file"><span>engine/level.py, Level.kinetic_dirichlet (simplified)</span><span>refined patch</span></div>
 <pre><code>alpha = 1j * d_tau / (4.0 * dx2)
@@ -186,7 +186,7 @@ denom = 1.0 + 6.0 * alpha
         \[ \omega_h = \frac{2}{\Delta x^2}\sum_{d}\sin^2\!\frac{k_d\Delta x}{2}, \qquad
            \omega_{\rm CN} = \frac{2}{\Delta\tau}\arctan\!\Big(\frac{\omega_h\,\Delta\tau}{2}\Big), \]
       </div>
-      <p>to be compared with the exact value \(k^2/2\). At the timestep used by the code the temporal error is negligible and the stencil dominates. For a wave sampled by four cells per wavelength (\(k\Delta x = \pi/2\)) the phase velocity is 19% below the exact value and the group velocity 36% below. For this reason the refinement criterion below requires at least four cells per de Broglie wavelength.</p>
+      <p>to be compared with the exact value \(k^2/2\). At the timestep used in the simulation the temporal error is negligible and the stencil dominates. For a wave sampled by four cells per wavelength (\(k\Delta x = \pi/2\)) the phase velocity is 19% below the exact value and the group velocity 36% below. For this reason the refinement criterion below requires at least four cells per de Broglie wavelength.</p>
     </div>
   </div>
 
@@ -260,10 +260,10 @@ denom = 1.0 + 6.0 * alpha
 
       <p>In MPI runs the volume is divided into slabs along \(z\), one per rank. The three-dimensional FFT is computed in stages. A two-dimensional FFT in \((x,y)\) is applied to each slab, a single <code>Alltoallv</code> redistributes the data into slabs along \(x\), and a one-dimensional FFT is applied along \(z\). The inverse transform reverses these operations. With a single rank the layer reduces to <code>torch.fft.fftn</code>, and the test bench verifies that both paths give identical results.</p>
 
-      <p>The command <code>python run.py preflight</code> prints all settings and the derived quantities before a run starts. These include the code units, cell size, Nyquist wavenumber, a lower bound on the number of steps, the memory required and the list of known open issues. The test bench groups its tests into eight independent layers, from FFT primitives to halo catalogues, and an error can be traced to the layer in which it originates.</p>
+      <p>The command <code>python run.py preflight</code> prints all settings and the derived quantities before a run starts. These include the simulation units, cell size, Nyquist wavenumber, a lower bound on the number of steps, the memory required and the list of known open issues. The test bench groups its tests into eight independent layers, from FFT primitives to halo catalogues, and an error can be traced to the layer in which it originates.</p>
 
       <h3>Cosmology and code</h3>
-      <p>All physical input is defined in three dataclasses in <code>run.py</code>, and the solver derives every quantity in code units from them. The table below follows each cosmological parameter from its definition to the function in which it acts.</p>
+      <p>All physical input is defined in three dataclasses in <code>run.py</code>, and the solver derives every quantity in simulation units from them. The table below follows each cosmological parameter from its definition to the function in which it acts.</p>
       <div class="file"><span>run.py</span><span>cosmology and box</span></div>
 <pre><code>@dataclass
 <span class="k">class</span> Cosmology:
@@ -285,7 +285,7 @@ denom = 1.0 + 6.0 * alpha
   <div class="row wide">
     <div class="body">
       <div class="table-wrap"><table>
-        <thead><tr><th> Parameter </th><th>Role in the code</th><th>Default and derived value</th></tr></thead>
+        <thead><tr><th> Parameter </th><th>Role in the simulation</th><th>Default and derived value</th></tr></thead>
         <tbody>
           <tr><td>boson mass \(m\)</td><td>length unit \(L_0=\sqrt{\hbar T_0/m}\)</td><td class="num">8×10⁻²³ eV, \(L_0\) = 23.2 kpc</td></tr>
           <tr><td>matter density, Hubble rate \(\Omega_{m0},\,H_0\)</td><td>time unit \(T_0\) and \(\dd a/\dd\tau\)</td><td class="num">\(T_0\) = 21.9 Gyr</td></tr>
@@ -302,7 +302,7 @@ denom = 1.0 + 6.0 * alpha
 
   <div class="row">
     <div class="body">
-      <p>The boson mass, the Hubble constant and the matter density enter the code through <code>physical_units</code> in <code>engine/cosmology.py</code>, which returns the units \(L_0\) and \(T_0\). The class <code>MPISchrodingerPoisson</code> in <code>engine/simulation.py</code> converts the box size to code units, evaluates the expansion rate with \(\Omega_{\Lambda 0}\) in its method <code>da_dtau</code> and advances the scale factor in <code>advance_a</code>. The initial redshift fixes the starting scale factor of the root level in <code>engine/parallel/level.py</code>. The power spectrum is sampled in <code>wavefunction_ic</code> in <code>engine/grids.py</code> and in its distributed counterpart <code>MPILevel._generate_ic</code>, and the growth rate that sets the phase of \(\psi\) is computed in <code>velocities_cosmo</code> in <code>engine/cosmology.py</code>. The virial overdensity is defined in the class <code>Units</code> in <code>engine/halos.py</code>.</p>
+      <p>The boson mass, the Hubble constant and the matter density enter the simulation through <code>physical_units</code> in <code>engine/cosmology.py</code>, which returns the units \(L_0\) and \(T_0\). The class <code>MPISchrodingerPoisson</code> in <code>engine/simulation.py</code> converts the box size to code units, evaluates the expansion rate with \(\Omega_{\Lambda 0}\) in its method <code>da_dtau</code> and advances the scale factor in <code>advance_a</code>. The initial redshift fixes the starting scale factor of the root level in <code>engine/parallel/level.py</code>. The power spectrum is sampled in <code>wavefunction_ic</code> in <code>engine/grids.py</code> and in its distributed counterpart <code>MPILevel._generate_ic</code>, and the growth rate that sets the phase of \(\psi\) is computed in <code>velocities_cosmo</code> in <code>engine/cosmology.py</code>. The virial overdensity is defined in the class <code>Units</code> in <code>engine/halos.py</code>.</p>
 
       <p>The initial conditions are generated in four stages. The Boltzmann code CLASS [9] computes the CDM power spectrum at z = 1000. This spectrum is multiplied by the square of the wave dark matter transfer function of Hu, Barkana and Gruzinov [3], given in eq. 16. A Gaussian random field with the resulting spectrum is then drawn on the grid, and the wavefunction is constructed from this field with eq. 17.</p>
       <p>At the initial redshift wave dark matter differs from CDM through a cutoff in the power spectrum near the Jeans scale at matter–radiation equality. The cutoff is described by the transfer function [3]</p>
