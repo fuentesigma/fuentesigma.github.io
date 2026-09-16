@@ -399,21 +399,21 @@ denom = 1.0 + 6.0 * alpha
   <div class="row wide">
     <div class="body">
       <div class="table-wrap"><table>
-        <thead><tr><th>Component</th><th>Test</th><th>Result</th></tr></thead>
+        <thead><tr><th>Test</th><th>Result</th></tr></thead>
         <tbody>
-          <tr><td>Numerics</td><td>Poisson solve against the analytic single-mode potential</td><td class="num">relative error 6.0×10⁻⁸</td></tr>
-          <tr><td>Integrator</td><td>free Gaussian packet spreads at the analytic rate</td><td class="num">width 1.4142, exact 1.4142</td></tr>
-          <tr><td>Integrator</td><td>Strang splitting convergence order</td><td class="num">p = 2.00</td></tr>
-          <tr><td>Integrator</td><td>unitarity over 200 steps (float64)</td><td class="num">norm changes by 5.6×10⁻¹⁴</td></tr>
-          <tr><td>Physics</td><td>a converged soliton stays stationary in real time</td><td class="num">peak density changes by 2.6×10⁻³</td></tr>
-          <tr><td>Cosmology</td><td>kinetic and source coefficients in code units equal 1</td><td class="num">1.000000, 1.000000</td></tr>
-          <tr><td>Cosmology</td><td>\(a(\tau)\) reaches \(a=1\) at z = 0</td><td class="num">error 1.4×10⁻⁷</td></tr>
-          <tr><td>Cosmology</td><td>initial velocities excite the growing mode</td><td class="num">1.07 times linear theory</td></tr>
-          <tr><td>AMR</td><td>restriction from a child conserves mass</td><td class="num">relative error 7.4×10⁻⁵</td></tr>
-          <tr><td>AMR</td><td>AMR moves a coarse run toward a fine reference</td><td class="num">small-scale power from 0.4 to 0.6 of the reference</td></tr>
-          <tr><td>MPI</td><td>single-rank distributed path reproduces the serial solvers</td><td class="num">identical to the last bit</td></tr>
-          <tr><td>Halos</td><td>halo finder recovers an injected soliton</td><td class="num">core radius within 0.3%, core mass within 0.7%</td></tr>
-          <tr><td>Halos</td><td>an unresolved core is reported as unresolved</td><td class="num">flagged as unresolved</td></tr>
+          <tr><td>Poisson solve against the analytic single-mode potential</td><td class="num">relative error 6.0×10⁻⁸</td></tr>
+          <tr><td>free Gaussian packet spreads at the analytic rate</td><td class="num">width 1.4142, exact 1.4142</td></tr>
+          <tr><td>Strang splitting convergence order</td><td class="num">p = 2.00</td></tr>
+          <tr><td>unitarity over 200 steps (float64)</td><td class="num">norm changes by 5.6×10⁻¹⁴</td></tr>
+          <tr><td>a converged soliton stays stationary in real time</td><td class="num">peak density changes by 2.6×10⁻³</td></tr>
+          <tr><td>kinetic and source coefficients in code units equal 1</td><td class="num">1.000000, 1.000000</td></tr>
+          <tr><td>\(a(\tau)\) reaches \(a=1\) at z = 0</td><td class="num">error 1.4×10⁻⁷</td></tr>
+          <tr><td>initial velocities excite the growing mode</td><td class="num">1.07 times linear theory</td></tr>
+          <tr><td>restriction from a child conserves mass</td><td class="num">relative error 7.4×10⁻⁵</td></tr>
+          <tr><td>AMR moves a coarse run toward a fine reference</td><td class="num">small-scale power from 0.4 to 0.6 of the reference</td></tr>
+          <tr><td>single-rank distributed path reproduces the serial solvers</td><td class="num">identical to the last bit</td></tr>
+          <tr><td>halo finder recovers an injected soliton</td><td class="num">core radius within 0.3%, core mass within 0.7%</td></tr>
+          <tr><td>an unresolved core is reported as unresolved</td><td class="num">flagged as unresolved</td></tr>
         </tbody>
       </table></div>
     </div>
