@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en" data-entry="psidm">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ψDM, a Schrödinger–Poisson code for wave dark matter</title>
+<meta name="description" content="Pseudo-spectral and finite-difference solver for the cosmological Schrödinger–Poisson equations, with adaptive mesh refinement, MPI and GPU support. Developed from a 2014 master's thesis.">
+<meta name="author" content="J. Fuentes Aguilar">
+<meta property="og:title" content="ψDM, a Schrödinger–Poisson code for wave dark matter">
+<meta property="og:description" content="Equations, numerical scheme, cosmological interface and results of a wave dark matter simulation code.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://fuentesigma.github.io/psidm/">
+<link rel="canonical" href="https://fuentesigma.github.io/psidm/">
+<meta property="og:image" content="https://fuentesigma.github.io/psidm/figures/soliton_formation_poster.png">
+<meta property="og:image:alt" content="Soliton core formed from the collapse of eight clumps of wave dark matter">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="stylesheet" href="../style.css">
+
+<!-- KaTeX: math rendering, no build step. Pinned version. -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: "\\[", right: "\\]", display: true },
+        { left: "\\(", right: "\\)", display: false }
+      ],
+      macros: {
+        "\\dd": "\\mathrm{d}",
+        "\\ii": "\\mathrm{i}",
+        "\\lap": "\\nabla^2",
+        "\\avg": "\\langle #1 \\rangle"
+      },
+      ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+      throwOnError: false
+    });
+  });
+</script>
+</head>
+<body>
+
+<header class="bar">
+  <a class="home" href="../"><span class="dot"></span>J. Fuentes Aguilar<span class="sep">/</span>notes</a>
+  <nav>
+    <a class="up" href="../">index</a>
+    <a href="#model">model</a>
+    <a href="#numerics">numerics</a>
+    <a href="#engine">code</a>
+    <a href="#results">results</a>
+    <a href="#limits">limitations</a>
+  </nav>
+</header>
+
+<main id="top">
+
+<!-- ================================================================ HERO -->
+<div class="hero">
+  <div class="row wide">
+    <div class="label">Scientific Computing<br>2014 to 2026</div>
+    <div class="body">
+      <div class="eyebrow">Cosmology</div>
+      <h1>Evolving the dark universe as a single wave (<span class="psi">ψ</span>DM)</h1>
+      <p class="lede">A solver for the Schrödinger–Poisson equations in an expanding universe to model large-scale structure formation. The code starts from the matter power spectrum at redshift 1000 and follows the dark matter wavefunction as it collapses into halos with solitonic cores. It combines a pseudo-spectral method on the root grid with finite differences on adaptively refined patches, and it runs on GPUs and across MPI ranks. The project began as my master's thesis at CINVESTAV-IPN, Mexico, in 2014. The code has since been rebuilt and systematically tested.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ TOC -->
+<section style="padding-top:2.2rem">
+  <div class="row wide">
+    <div class="label">Index</div>
+    <div class="body">
+      <ol class="toc">
+        <li><a href="#model"><span class="n">01</span><span class="t">Wave dark matter and its equations</span></a></li>
+        <li><a href="#numerics"><span class="n">02</span><span class="t">Discretisation and adaptive refinement</span></a></li>
+        <li><a href="#engine"><span class="n">03</span><span class="t">Engine and cosmological interface</span></a></li>
+        <li><a href="#results"><span class="n">04</span><span class="t">Results and validation</span></a></li>
+        <li><a href="#limits"><span class="n">05</span><span class="t">Limitations and next steps</span></a></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ 01 MODEL -->
+<section id="model">
+  <div class="row">
+    <div class="label"><span class="num">01</span>Model</div>
+    <div class="body"><h2>Wave dark matter and its equations</h2></div>
+  </div>
+
+  <div class="row">
+    <div class="label"></div>
+    <div class="body">
+      <p>The cold dark matter (CDM) model reproduces the large-scale distribution of matter in the universe. Its predictions on galactic scales are less satisfactory. Collisionless simulations produce halos with central density cusps, whereas the rotation curves of many dwarf galaxies are consistent with constant-density cores. The same simulations predict more subhalos than the number of satellites observed around the Milky Way.</p>
+      <p>Wave dark matter, also called fuzzy dark matter, addresses these discrepancies with a boson of mass \(m \sim 10^{-22}\,\mathrm{eV}\) [3, 5]. The de Broglie wavelength of such a particle is of the order of a kiloparsec. At galactic occupation numbers the dark matter is described by a classical field \(\psi\) that obeys the Schrödinger–Poisson equations [7]. Quantum pressure suppresses gravitational collapse below a Jeans length, and every halo develops a stationary core, the soliton, embedded in an envelope of interference granules [1, 2]. A simulation must resolve the local de Broglie wavelength throughout the volume. This requirement motivates the adaptive grids described in §02.</p>
+
+      <p>In comoving coordinates \(\mathbf{x}\) with scale factor \(a(t)\), the field obeys the Schrödinger equation with a gravitational potential \(\Phi\) sourced by the density contrast \(\delta\).</p>
+      <div class="eq"><span class="tag">eq. 1</span>
+        \[ \ii\hbar\,\frac{\partial\psi}{\partial t} = -\frac{\hbar^2}{2 m a^2}\,\lap\psi + m\,\Phi\,\psi,
+           \qquad \lap\Phi = \frac{4\pi G\,\bar\rho_{m0}}{a}\,\delta,
+           \qquad \delta = \frac{|\psi|^2}{\avg{|\psi|^2}} - 1 . \]
+      </div>
+      <p>The background is a flat ΛCDM universe with expansion rate</p>
+      <div class="eq"><span class="tag">eq. 2</span>
+        \[ H(a) = H_0\,E(a), \qquad E(a) = \sqrt{\Omega_{m0}\,a^{-3} + \Omega_{\Lambda 0}} . \]
+      </div>
+
+      <p>The code uses units that remove every physical constant from the equations. Time is measured by \(\dd\tau = \dd t/(a^2 T_0)\) and lengths by \(L_0\), and the mean density is normalised to unity, with</p>
+      <div class="eq"><span class="tag">eq. 3</span>
+        \[ T_0 = \Big(\tfrac{3}{2}H_0^2\,\Omega_{m0}\Big)^{-1/2}, \qquad
+           L_0 = \sqrt{\hbar\,T_0/m}, \qquad
+           V = \frac{a\,m\,T_0}{\hbar}\,\Phi, \qquad \avg{|\psi|^2} = 1 . \]
+      </div>
+      <p>Eq. 1 then takes the form integrated by the code.</p>
+      <div class="eq"><span class="tag">eq. 4</span>
+        \[ \ii\,\frac{\partial\psi}{\partial\tau} = -\frac12\lap\psi + a\,V\,\psi, \qquad
+           \lap V = |\psi|^2 - 1, \qquad
+           \frac{\dd a}{\dd\tau} = \frac{a^3\,E(a)}{\sqrt{3\,\Omega_{m0}/2}} . \]
+      </div>
+      <p>Cosmology enters the dynamics only through the factor \(a\) in front of the potential and through the evolution of \(a(\tau)\). The test bench confirms that both coefficients in eq. 4 equal one (§04). For \(m = 8\times10^{-23}\,\mathrm{eV}\), \(H_0 = 70\,\mathrm{km\,s^{-1}\,Mpc^{-1}}\) and \(\Omega_{m0}=0.27\), the code length is \(L_0 = 23.2\) comoving kpc and the code time is \(T_0 = 21.9\) Gyr.</p>
+
+      <p>The Madelung substitution \(\psi = \sqrt{\rho}\,e^{\ii S}\) maps eq. 4 onto a continuity equation and an Euler equation with an additional quantum pressure term.</p>
+      <div class="eq"><span class="tag">eq. 5</span>
+        \[ \partial_\tau\rho + \nabla\!\cdot(\rho\,\nabla S) = 0, \qquad
+           \partial_\tau \nabla S + (\nabla S\cdot\nabla)\nabla S = -a\,\nabla V + \nabla\!\left(\frac{\lap\sqrt\rho}{2\sqrt\rho}\right). \]
+      </div>
+      <p>Linearising eq. 5 about a homogeneous background gives the Jeans wavenumber \(k_J = (16\pi G\rho\, m^2/\hbar^2)^{1/4}\). Modes with \(k &lt; k_J\) grow, and modes with \(k &gt; k_J\) oscillate. The resulting suppression of small-scale power is imposed in the initial conditions (§03).</p>
+
+      <p>The evolution conserves the mass \(M=\int|\psi|^2\) and, in a static box, the energy \(E = \int \big(\tfrac12|\nabla\psi|^2 + \tfrac12 V|\psi|^2\big)\). The equations are also invariant under the scaling</p>
+      <div class="eq"><span class="tag">eq. 6</span>
+        \[ \psi(\mathbf{x},t) \;\to\; \lambda^2\,\psi(\lambda\mathbf{x},\,\lambda^2 t)
+           \quad\Longrightarrow\quad \rho_c\,r_c^4 = C \;\;\text{for every soliton,} \]
+      </div>
+      <p>which provides the parameter-free test of §04.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ 02 NUMERICS -->
+<section id="numerics">
+  <div class="row">
+    <div class="label"><span class="num">02</span>Numerics</div>
+    <div class="body"><h2>Discretisation and adaptive refinement</h2></div>
+  </div>
+
+  <div class="row">
+    <div class="label"></div>
+    <div class="body">
+      <p>The Hamiltonian in eq. 4 separates into a kinetic term, diagonal in Fourier space, and a potential term, diagonal in real space. Strang splitting [8] applies a half potential kick, a full kinetic drift and a second half kick.</p>
+      <div class="eq"><span class="tag">eq. 7</span>
+        \[ \psi^{n+1} = e^{-\ii\, a V^{\ast}\,\Delta\tau/2}\;
+           \mathcal{F}^{-1}\!\Big[e^{-\ii\, k^2\Delta\tau/2}\,\mathcal{F}\big[e^{-\ii\, aV^n\Delta\tau/2}\,\psi^n\big]\Big] . \]
+      </div>
+      <p>Every factor in eq. 7 has unit modulus, and each step is therefore unitary. The potential \(V^\ast\) of the second kick is computed from the density after the drift. A kick changes the phase of \(\psi\) and leaves \(|\psi|\) unchanged, which makes \(V^\ast\) the potential at the end of the step and keeps the scheme symmetric and second order. Reusing \(V^n\) reduces the method to first order. The test bench measures a convergence order \(p = 2.00\).</p>
+
+      <div class="file"><span>engine/solvers.py</span><span>root grid</span></div>
+<pre><code><span class="k">def</span> strang_step(psi, k2_torch, V, a, d_tau, *, potential):
+    dt_half = d_tau / 2.0
+
+    psi = _kick(psi, V, a, dt_half)          <span class="c"># psi * exp(-i a V dt/2)</span>
+    psi = _drift(psi, k2_torch, d_tau)       <span class="c"># exact in Fourier space</span>
+
+    <span class="c"># V from the post-drift density: without this the scheme is first order</span>
+    <span class="k">if</span> potential <span class="k">is not</span> None:
+        V = potential(torch.abs(psi) ** 2)
+
+    <span class="k">return</span> _kick(psi, V, a, dt_half)</code></pre>
+
+      <p>On the periodic root grid the drift is exact in Fourier space for any \(\Delta\tau\), and the Poisson equation reduces to a division.</p>
+      <div class="eq"><span class="tag">eq. 8</span>
+        \[ \hat V(\mathbf{k}) = -\frac{\widehat{\rho - \bar\rho}(\mathbf{k})}{k^2}, \qquad \hat V(\mathbf{0}) = 0 . \]
+      </div>
+      <p>The \(k=0\) mode is set to zero. In a periodic volume the mean density is the cosmological background, whose effect is already contained in \(a(\tau)\).</p>
+
+      <p>Refined patches are subdomains of a larger grid and are not periodic. A Fourier transform on a patch would couple opposite faces. The kinetic step on patches therefore uses the 7-point Laplacian, with Dirichlet ghost cells interpolated from the parent level, advanced with the Crank–Nicolson scheme</p>
+      <div class="eq"><span class="tag">eq. 9</span>
+        \[ \Big(1 + \tfrac{\ii\Delta\tau}{2} H_h\Big)\psi^{n+1} = \Big(1 - \tfrac{\ii\Delta\tau}{2} H_h\Big)\psi^{n},
+           \qquad H_h\psi_{ijk} = -\frac{1}{2\Delta x^2}\Big(\textstyle\sum_{\rm 6\,nb}\psi - 6\,\psi_{ijk}\Big). \]
+      </div>
+      <p>The discrete operator \(H_h\) is Hermitian. The Crank–Nicolson update is its Cayley transform and is unitary, as is the spectral step. With \(\alpha = \ii\Delta\tau/4\Delta x^2\) the update for a single cell reads</p>
+      <div class="eq"><span class="tag">eq. 10</span>
+        \[ (1+6\alpha)\,\psi^{n+1}_{ijk} - \alpha\!\sum_{\rm nb}\psi^{n+1} \;=\; (1-6\alpha)\,\psi^{n}_{ijk} + \alpha\!\sum_{\rm nb}\psi^{n} . \]
+      </div>
+      <p>The implicit system is solved by red–black Gauss–Seidel iteration, implemented on the GPU as two masked array updates. Over-relaxation with \(\omega &gt; 1\) diverges for this complex, weakly diagonally dominant system, and the code uses \(\omega = 1\).</p>
+
+      <div class="file"><span>engine/level.py, Level.kinetic_dirichlet (simplified)</span><span>refined patch</span></div>
+<pre><code>alpha = 1j * d_tau / (4.0 * dx2)
+rhs   = (1.0 - 6.0 * alpha) * psi_old + alpha * neigh_old
+denom = 1.0 + 6.0 * alpha
+
+<span class="k">for</span> it <span class="k">in</span> range(max_iter):
+    <span class="k">for</span> mask <span class="k">in</span> (red_mask, black_mask):
+        neigh_new  = sum_of_six_neighbours(psi_new_pad)
+        psi_jacobi = (rhs + alpha * neigh_new) / denom
+        psi_int[mask] = psi_jacobi[mask]          <span class="c"># omega = 1, SOR diverges</span>
+    <span class="k">if</span> residual(psi_new_pad).abs().max() &lt; tol:
+        <span class="k">break</span></code></pre>
+
+      <p>The spatial discretisation introduces a dispersion error at short wavelengths. For a plane wave the discrete frequencies are</p>
+      <div class="eq"><span class="tag">eq. 11</span>
+        \[ \omega_h = \frac{2}{\Delta x^2}\sum_{d}\sin^2\!\frac{k_d\Delta x}{2}, \qquad
+           \omega_{\rm CN} = \frac{2}{\Delta\tau}\arctan\!\Big(\frac{\omega_h\,\Delta\tau}{2}\Big), \]
+      </div>
+      <p>to be compared with the exact value \(k^2/2\). At the timestep used by the code the temporal error is negligible and the stencil dominates. For a wave sampled by four cells per wavelength (\(k\Delta x = \pi/2\)) the phase velocity is 19% below the exact value and the group velocity 36% below. For this reason the refinement criterion below requires at least four cells per de Broglie wavelength.</p>
+    </div>
+  </div>
+
+  <div class="row wide">
+    <div class="label"></div>
+    <div class="body">
+      <figure>
+        <img src="figures/dispersion.svg" alt="Ratio of numerical to exact dispersion versus k dx for spectral, finite-difference and Crank-Nicolson schemes" width="560" height="280" loading="lazy">
+        <figcaption class="caption"><span class="n">Fig. 1</span><span>Phase error of the kinetic operator along one axis. The spectral root grid is exact. On patches the error is set by the 7-point stencil, and Crank–Nicolson at \(\Delta\tau = 0.265\,\Delta x^2\) adds a negligible contribution.</span></figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="label"></div>
+    <div class="body">
+      <p>Every level advances with the timestep</p>
+      <div class="eq"><span class="tag">eq. 12</span>
+        \[ \Delta\tau = \min\!\left(\frac{4\,C_K}{3\pi}\,\Delta x^2,\;\; \frac{2\pi\,C_W}{a\,\max|V|}\right), \qquad C_K = 0.625,\;\; C_W = 0.3 . \]
+      </div>
+      <p>The first bound resolves the fastest kinetic phase rotation on the grid, and the second limits the phase added by a single potential kick. Because \(\Delta\tau \propto \Delta x^2\), halving the cell size multiplies the number of steps by four, and refined levels are therefore subcycled. The scale factor is integrated with a fourth-order Runge–Kutta method, with substeps that keep \(\Delta a/a \le 2\%\).</p>
+
+      <h3>Adaptive mesh refinement</h3>
+      <p>A cell is flagged for refinement when any of the three indicators in the table exceeds its threshold. Flags are dilated by one cell and grouped into blocks of 32³ cells. Each flagged block spawns a child level with twice the resolution, up to six levels.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Criterion</th><th>Condition</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td>de Broglie</td><td class="math">\(|\nabla S| = \big|\operatorname{Im}(\nabla\psi/\psi)\big| &gt; \dfrac{2\pi}{N_\lambda\,\Delta x}\), \(N_\lambda = 4\)</td><td>at least four cells per local wavelength (fig. 1)</td></tr>
+          <tr><td>Density</td><td class="math">\(\rho &gt; 4\,\bar\rho\)</td><td>resolution in collapsed regions independent of the phase</td></tr>
+          <tr><td>Löhner [6]</td><td class="math">\(\sqrt{\dfrac{\sum_d (f_{i+1}-2f_i+f_{i-1})^2}{\sum_d (|f_{i+1}-f_i|+|f_i-f_{i-1}|)^2+\epsilon}} &gt; 0.5\)</td><td>normalised curvature of \(\rho\), \(\operatorname{Re}\psi\) and \(\operatorname{Im}\psi\), sensitive to sharp interference fringes</td></tr>
+        </tbody>
+      </table></div>
+      <p>At most 30% of the blocks are refined, in order of the number of flagged cells. The hierarchy is rebuilt every 500 root steps.</p>
+
+      <p>A child level advances in \(n_{\rm sub} = \lceil \Delta\tau_{\rm parent}/\Delta\tau_{\rm child}\rceil\) substeps. At substep \(j\) its ghost cells are trilinear interpolations of the parent, weighted in time between the old and new parent states.</p>
+      <div class="eq"><span class="tag">eq. 13</span>
+        \[ \psi_{\rm ghost} = \mathcal{I}\big[(1-\theta)\,\psi_{\rm parent}^{n} + \theta\,\psi_{\rm parent}^{n+1}\big], \qquad \theta = \frac{j+\tfrac12}{n_{\rm sub}} . \]
+      </div>
+      <p>The child does not solve the Poisson equation independently. Its potential is the interpolated parent potential plus a correction sourced by the density that the parent grid does not resolve.</p>
+      <div class="eq"><span class="tag">eq. 14</span>
+        \[ V_{\rm child} = \mathcal{I}[V_{\rm parent}] + \mathcal{P}\big[\rho_{\rm child} - \mathcal{I}[\rho_{\rm parent}]\big] . \]
+      </div>
+      <p>After each parent step the fine solution is restricted to the parent grid. Each coarse cell receives the mean density of its \(2^3\) children and the phase of their mean amplitude.</p>
+      <div class="eq"><span class="tag">eq. 15</span>
+        \[ \psi_{\rm coarse} = \frac{\avg{\psi_{\rm fine}}}{|\avg{\psi_{\rm fine}}|}\,\sqrt{\avg{|\psi_{\rm fine}|^2}} . \]
+      </div>
+      <p>This restriction conserves mass by construction and discards part of the phase information (§05).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ 03 ENGINE -->
+<section id="engine">
+  <div class="row">
+    <div class="label"><span class="num">03</span>Code</div>
+    <div class="body"><h2>Engine and cosmological interface</h2></div>
+  </div>
+
+  <div class="row">
+    <div class="label"></div>
+    <div class="body">
+      <p>The engine is written in PyTorch, and the same code runs on NVIDIA GPUs, Apple silicon and CPUs. The kick, drift and Poisson kernels are compiled with <code>torch.compile</code> when CUDA is available. Physics, numerics and parallelism reside in separate modules, and each module can be tested in isolation.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Module</th><th>Content</th></tr></thead>
+        <tbody>
+          <tr><td><code>engine/cosmology.py</code></td><td>unit system, growth rate, Zel'dovich velocity scale, \(P(k)\) interpolation</td></tr>
+          <tr><td><code>engine/grids.py</code></td><td>meshes, \(k^2\), Gaussian random field for the initial wavefunction</td></tr>
+          <tr><td><code>engine/solvers.py</code></td><td>spectral Poisson solver, kick and drift kernels, Strang step</td></tr>
+          <tr><td><code>engine/level.py</code></td><td>grid level with ghost cells, Crank–Nicolson kinetic step and restriction</td></tr>
+          <tr><td><code>engine/amr.py</code></td><td>refinement indicators, block patches, hierarchy rebuild</td></tr>
+          <tr><td><code>engine/simulation.py</code></td><td>time integration with timestep control, subcycling, scale factor and output</td></tr>
+          <tr><td><code>engine/halos.py</code></td><td>halo finder, soliton and NFW fits, physical units</td></tr>
+          <tr><td><code>engine/parallel/</code></td><td>MPI communicator, slab domain, distributed FFT, ghost exchange, HDF5 I/O</td></tr>
+          <tr><td><code>run.py</code> and <code>bench.py</code></td><td>command interface (<code>status</code>, <code>preflight</code>, <code>check</code>, <code>bigbang</code>) and test bench</td></tr>
+        </tbody>
+      </table></div>
+
+      <p>In MPI runs the volume is divided into slabs along \(z\), one per rank. The three-dimensional FFT is computed in stages. A two-dimensional FFT in \((x,y)\) is applied to each slab, a single <code>Alltoallv</code> redistributes the data into slabs along \(x\), and a one-dimensional FFT is applied along \(z\). The inverse transform reverses these operations. With a single rank the layer reduces to <code>torch.fft.fftn</code>, and the test bench verifies that both paths give identical results.</p>
+
+      <p>The command <code>python run.py preflight</code> prints all settings and the derived quantities before a run starts. These include the code units, cell size, Nyquist wavenumber, a lower bound on the number of steps, the memory required and the list of known open issues. The test bench groups its tests into eight independent layers, from FFT primitives to halo catalogues, and an error can be traced to the layer in which it originates.</p>
+
+      <h3>Cosmology and code</h3>
+      <p>All physical input is defined in three dataclasses in <code>run.py</code>, and the solver derives every quantity in code units from them. The table below follows each cosmological parameter from its definition to the function in which it acts.</p>
+      <div class="file"><span>run.py</span><span>cosmology and box</span></div>
+<pre><code>@dataclass
+<span class="k">class</span> Cosmology:
+    H0_km_s_Mpc: float = 70.0
+    Omega_m0:    float = 0.27
+    Omega_L0:    float = 0.73
+    m_boson_eV:  float = 8.0e-23
+    z_ini:       float = 1000.0
+    z_final:     float = 0.0
+    pk_file:     str   = <span class="s">"ic/psidm_pk_z1000.txt"</span>
+
+@dataclass
+<span class="k">class</span> Box:
+    L_box_Mpc: float = 4.0
+    nx: int = 128;  ny: int = 128;  nz: int = 128</code></pre>
+    </div>
+  </div>
+
+  <div class="row wide">
+    <div class="label"></div>
+    <div class="body">
+      <div class="table-wrap"><table>
+        <thead><tr><th> Parameter </th><th>Role in the code</th><th>Default and derived value</th></tr></thead>
+        <tbody>
+          <tr><td>boson mass \(m\)</td><td>length unit \(L_0=\sqrt{\hbar T_0/m}\)</td><td class="num">8×10⁻²³ eV, \(L_0\) = 23.2 kpc</td></tr>
+          <tr><td>matter density, Hubble rate \(\Omega_{m0},\,H_0\)</td><td>time unit \(T_0\) and \(\dd a/\dd\tau\)</td><td class="num">\(T_0\) = 21.9 Gyr</td></tr>
+          <tr><td>dark energy \(\Omega_{\Lambda 0}\)</td><td>\(E(a)\) in the expansion and the growth rate</td><td class="num">0.73</td></tr>
+          <tr><td>box size \(L_{\rm box}\)</td><td>\(L = L_{\rm box}/L_0\), \(\Delta x = L/n\)</td><td class="num">4 Mpc, 172.5 \(L_0\), \(\Delta x\) = 1.35</td></tr>
+          <tr><td>initial redshift \(z_{\rm ini}\)</td><td>\(a_{\rm ini}\) multiplies \(V\) in every kick</td><td class="num">1000, \(a\) = 9.99×10⁻⁴</td></tr>
+          <tr><td>primordial spectrum \(P(k)\)</td><td>amplitude of \(|\psi|\)</td><td class="num">CLASS × FDM transfer</td></tr>
+          <tr><td>linear growth rate \(f \simeq \Omega_m(a)^{0.55}\)</td><td>phase of \(\psi\)</td><td class="num">vel_scale = 0.0258</td></tr>
+          <tr><td>virial overdensity \(\Delta_c(z)\)</td><td>halo boundary in units of \(\bar\rho\)</td><td class="num">\(\Delta_c/\Omega_m\) = 359 at z = 0 (Bryan–Norman)</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="label"></div>
+    <div class="body">
+      <p>The boson mass, the Hubble constant and the matter density enter the code through <code>physical_units</code> in <code>engine/cosmology.py</code>, which returns the units \(L_0\) and \(T_0\). The class <code>MPISchrodingerPoisson</code> in <code>engine/simulation.py</code> converts the box size to code units, evaluates the expansion rate with \(\Omega_{\Lambda 0}\) in its method <code>da_dtau</code> and advances the scale factor in <code>advance_a</code>. The initial redshift fixes the starting scale factor of the root level in <code>engine/parallel/level.py</code>. The power spectrum is sampled in <code>wavefunction_ic</code> in <code>engine/grids.py</code> and in its distributed counterpart <code>MPILevel._generate_ic</code>, and the growth rate that sets the phase of \(\psi\) is computed in <code>velocities_cosmo</code> in <code>engine/cosmology.py</code>. The virial overdensity is defined in the class <code>Units</code> in <code>engine/halos.py</code>.</p>
+
+      <p>The initial conditions are generated in four stages. The Boltzmann code CLASS [9] computes the CDM power spectrum at z = 1000. This spectrum is multiplied by the square of the wave dark matter transfer function of Hu, Barkana and Gruzinov [3], given in eq. 16. A Gaussian random field with the resulting spectrum is then drawn on the grid, and the wavefunction is constructed from this field with eq. 17.</p>
+      <p>At the initial redshift wave dark matter differs from CDM through a cutoff in the power spectrum near the Jeans scale at matter–radiation equality. The cutoff is described by the transfer function [3]</p>
+      <div class="eq"><span class="tag">eq. 16</span>
+        \[ T_F(k) = \frac{\cos x^3}{1+x^8}, \qquad x = 1.61\,m_{22}^{1/18}\,\frac{k}{k_{J,\rm eq}}, \qquad k_{J,\rm eq} = 9\,m_{22}^{1/2}\;\mathrm{Mpc}^{-1} . \]
+      </div>
+      <p>A Gaussian random field is drawn with \(\hat\delta(\mathbf{k}) = \eta_{\mathbf{k}}\sqrt{P(k)\,N/V}\), where \(\eta_{\mathbf{k}}\) is complex white noise. The density fixes the modulus of \(\psi\). The phase follows from the linear continuity equation \(\partial_\tau\delta = -\lap S\) for the growing mode \(\delta \propto D(a)\).</p>
+      <div class="eq"><span class="tag">eq. 17</span>
+        \[ \psi_{\rm ini} = \sqrt{1+\delta}\;e^{\ii S}, \qquad
+           \hat S(\mathbf{k}) = f(a)\,a^2 H(a)\,T_0\;\frac{\hat\delta(\mathbf{k})}{k^2} . \]
+      </div>
+      <p>The sign of \(\hat S\) selects the growing mode. With the opposite sign the velocities excite the decaying mode, and linear growth reaches only 0.21 of the correct value. The test bench evolves the output of the generator and recovers \(\delta \propto a\) to within 7%.</p>
+    </div>
+  </div>
+
+  <div class="row wide">
+    <div class="label"></div>
+    <div class="body">
+      <figure>
+        <img src="figures/ic_power_spectrum.svg" alt="Wave dark matter power spectrum at z=1000 with a sharp cutoff near 6 per Mpc. The grey band shows the wavenumbers resolved by a 4 Mpc, 128 cubed box" width="560" height="300" loading="lazy">
+        <figcaption class="caption"><span class="n">Fig. 2</span><span>Input spectrum <code>ic/psidm_pk_z1000.txt</code> for \(m_{22}=0.8\). The grey band extends from the fundamental mode to the Nyquist wavenumber of the default 4 Mpc, 128³ box and contains the full cutoff.</span></figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="label"></div>
+    <div class="body">
+      <p>The conversion to physical units takes place at output. The class <code>halos.Units</code> converts code densities to \(M_\odot\,\mathrm{pc}^{-3}\) and cells to proper kpc at the current \(a\). It also computes the virial overdensity of Bryan and Norman [4], and cores are fitted with the soliton profile of Schive et al. [1].</p>
+      <div class="eq"><span class="tag">eq. 18</span>
+        \[ \Delta_c = 18\pi^2 + 82x - 39x^2, \quad x = \Omega_m(z)-1, \qquad
+           \rho_{\rm sol}(r) = \frac{\rho_c}{\big[1+0.091\,(r/r_c)^2\big]^8} . \]
+      </div>
+      <p>The spherical-overdensity halo finder smooths the density field before locating peaks, which prevents interference granules from being identified as halos. Each halo is fitted with the soliton profile in the core and with an NFW profile outside it. Fits that reach the boundary of the search range, and cores narrower than two cells, are reported as unresolved.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ 04 RESULTS -->
+<section id="results">
+  <div class="row">
+    <div class="label"><span class="num">04</span>Results</div>
+    <div class="body"><h2>Results and validation</h2></div>
+  </div>
+
+  <div class="row">
+    <div class="label"></div>
+    <div class="body">
+      <h3 style="margin-top:0">Soliton formation</h3>
+      <p>This test does not involve cosmology. Eight Gaussian concentrations of wave matter with random phases are placed in a periodic box with \(G = 1\). The initial state contains no soliton. The system collapses, relaxes and forms a central core.</p>
+      <p>The scaling invariance of eq. 6 gives a prediction without free parameters. The ground state computed by imaginary-time evolution fixes \(C = \rho_c r_c^4 = 0.2429\), and any soliton must then satisfy \(r_c = (C/\rho_c)^{1/4}\) independently of its mass. The core formed in the simulation is fitted at every snapshot, and its radius is compared with this prediction.</p>
+      <p>The box has a side length of 30 code units and is divided into 128 cells along each axis. Each of the eight clumps has a mass of 0.6 in code units. The system is evolved up to \(t = 120\), which requires 8,760 time steps and 36 minutes on the CPU of an Apple M1 Pro. Over the second half of the run the fitted core radius is on average 1.05 times the predicted value, with a standard deviation of 0.06. At the end of the run the soliton contains 59% of the total mass. The total mass departs from its initial value by at most a fraction \(2.6\times10^{-13}\), and the total energy by at most \(3.7\times10^{-5}\).</p>
+    </div>
+  </div>
+
+  <div class="row wide">
+    <div class="label"></div>
+    <div class="body">
+      <figure>
+        <img src="figures/soliton_profile.svg" alt="Radial density profile of the formed core with Schive fit and rescaled ground state overlapping to r of about 3, followed by a power-law envelope" width="707" height="462" loading="lazy">
+        <figcaption class="caption"><span class="n">Fig. 3</span><span>Density profile at \(t=120\). The grey band is the independent ground state rescaled to the same \(\rho_c\) with eq. 6, without fitting. Beyond about \(3\,r_c\) the profile follows an envelope with logarithmic slope −2.5.</span></figcaption>
+      </figure>
+
+      <figure>
+        <img src="figures/soliton_formation.webp" alt="Animation of eight clumps of wave matter merging into a single dense core that oscillates and becomes surrounded by interference fringes, with a curve of the maximum density over time below" width="1200" height="860" loading="lazy">
+        <figcaption class="caption"><span class="n">Fig. 4</span><span>Formation of the soliton from \(t = 0\) to \(t = 120\). The left panel shows the density integrated along one axis of the box, and the right panel the density in the plane that contains the core. Both use a logarithmic colour scale with the same limits in every frame. The view is shifted periodically to keep the final core at the centre. The lower curve shows the maximum density in the box, whose peaks correspond to successive compressions of the core.</span></figcaption>
+      </figure>
+
+      <figure>
+        <img src="figures/soliton_rc_ratio.svg" alt="Fitted core radius over predicted core radius versus time, oscillating around one" width="560" height="260" loading="lazy">
+        <figcaption class="caption"><span class="n">Fig. 5</span><span>Ratio of fitted to predicted core radius at 40 snapshots. The core oscillates after the collapse. After the first collapse the ratio remains within about 15% of unity, and over the second half of the run it averages 1.05.</span></figcaption>
+      </figure>
+
+      <figure>
+        <img src="figures/soliton_conservation.svg" alt="Mass drift near 1e-13 and energy drift between 1e-7 and 1e-4 over time" width="560" height="260" loading="lazy">
+        <figcaption class="caption"><span class="n">Fig. 6</span><span>Relative drift of mass and energy. Mass is conserved to round-off in double precision. The energy error peaks at each maximum compression of the core and decreases as the core expands.</span></figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="label"></div>
+    <div class="body">
+      <div class="table-wrap"><table>
+        <thead><tr><th>Quantity</th><th>Value</th></tr></thead>
+        <tbody>
+          <tr><td>median rms deviation of the core from the Schive profile</td><td class="num">0.055</td></tr>
+          <tr><td>late-time deviation of \(r_c\) from the ground-state invariant</td><td class="num">4.9%</td></tr>
+          <tr><td>core radius of the reference ground state</td><td class="num">6.0 cells</td></tr>
+          <tr><td>smallest core radius of the formed soliton</td><td class="num">4.4 cells</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Cosmological runs</h3>
+      <p>The complete pipeline starts from the initial conditions of fig. 2 in a 4 Mpc box with adaptive refinement enabled and evolves them to redshift zero with <code>python run.py bigbang</code>, or with <code>mpirun -np N python run.py bigbang</code> in parallel. The run writes HDF5 checkpoints, density slices, the final matter power spectrum and a halo catalogue with core radii and core masses in physical units.</p>
+
+      <h3>Test bench</h3>
+      <p>The command <code>python run.py check</code> runs 33 tests in eight layers. Each test compares the code with an independent reference, such as an analytic solution, a conservation law, a convergence rate or the input supplied to the code. The full suite runs in 36 s on an Apple M1 Pro CPU. The table lists a selection of the tests.</p>
+    </div>
+  </div>
+
+  <div class="row wide">
+    <div class="label"></div>
+    <div class="body">
+      <div class="table-wrap"><table>
+        <thead><tr><th>Component</th><th>Test</th><th>Result</th></tr></thead>
+        <tbody>
+          <tr><td>Numerics</td><td>Poisson solve against the analytic single-mode potential</td><td class="num">relative error 6.0×10⁻⁸</td></tr>
+          <tr><td>Integrator</td><td>free Gaussian packet spreads at the analytic rate</td><td class="num">width 1.4142, exact 1.4142</td></tr>
+          <tr><td>Integrator</td><td>Strang splitting convergence order</td><td class="num">p = 2.00</td></tr>
+          <tr><td>Integrator</td><td>unitarity over 200 steps (float64)</td><td class="num">norm changes by 5.6×10⁻¹⁴</td></tr>
+          <tr><td>Physics</td><td>a converged soliton stays stationary in real time</td><td class="num">peak density changes by 2.6×10⁻³</td></tr>
+          <tr><td>Cosmology</td><td>kinetic and source coefficients in code units equal 1</td><td class="num">1.000000, 1.000000</td></tr>
+          <tr><td>Cosmology</td><td>\(a(\tau)\) reaches \(a=1\) at z = 0</td><td class="num">error 1.4×10⁻⁷</td></tr>
+          <tr><td>Cosmology</td><td>initial velocities excite the growing mode</td><td class="num">1.07 times linear theory</td></tr>
+          <tr><td>AMR</td><td>restriction from a child conserves mass</td><td class="num">relative error 7.4×10⁻⁵</td></tr>
+          <tr><td>AMR</td><td>AMR moves a coarse run toward a fine reference</td><td class="num">small-scale power from 0.4 to 0.6 of the reference</td></tr>
+          <tr><td>MPI</td><td>single-rank distributed path reproduces the serial solvers</td><td class="num">identical to the last bit</td></tr>
+          <tr><td>Halos</td><td>halo finder recovers an injected soliton</td><td class="num">core radius within 0.3%, core mass within 0.7%</td></tr>
+          <tr><td>Halos</td><td>an unresolved core is reported as unresolved</td><td class="num">flagged as unresolved</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ 05 LIMITS -->
+<section id="limits">
+  <div class="row">
+    <div class="label"><span class="num">05</span>Limitations</div>
+    <div class="body"><h2>Limitations and next steps</h2></div>
+  </div>
+  <div class="row">
+    <div class="label"></div>
+    <div class="body">
+      <p>The following issues are reported by the test bench and remain open.</p>
+      <ul>
+        <li>The soliton test at 128³ is at the limit of its resolution. At maximum compression the core radius of the formed soliton spans 4.4 cells, compared with 6.0 cells for the reference ground state. The measured core radius agrees with the prediction, but convergence has not been demonstrated at 256³.</li>
+        <li>The patch boundaries dominate the AMR error. After one short step the error on the faces of a child patch is 2.5×10⁻⁴, compared with 1.1×10⁻⁵ in its interior. Higher-order prolongation of the ghost cells should reduce it.</li>
+        <li>Restriction does not preserve the phase exactly. Creating a child and restricting it without any evolution changes \(\psi\) by 5.5×10⁻³ while conserving mass. A conservative restriction of \(\operatorname{Re}\psi\) and \(\operatorname{Im}\psi\) followed by a norm correction is the planned replacement.</li>
+        <li>The default <code>sigma_delta = 0.05</code> rescales the initial field to about ten times the amplitude of the loaded \(P(k)\), and the evolution becomes non-linear at \(z \approx 49\) instead of \(z \approx 4\). This setting is intended for short tests. With <code>sigma_delta = None</code> the generator reproduces the input amplitude to within 2%.</li>
+        <li>The MPI layer has been verified with a single rank only. The ghost-cell exchange between several ranks has not yet been run on a system with <code>mpi4py</code>.</li>
+        <li>The Bogoliubov solver of the side study in <code>fdm_qg/</code> reproduces its analytic references, but its quantum-gravity operator is only real-linear. Its eigenvalues require the 2×2 \((u,v)\) formulation before they can be used.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ REFERENCES -->
+<section id="refs">
+  <div class="row">
+    <div class="label">References</div>
+    <div class="body">
+      <ol class="refs">
+        <li>H.-Y. Schive, T. Chiueh, T. Broadhurst, <em>Cosmic structure as the quantum interference of a coherent dark wave</em>, Nature Physics 10, 496 (2014).</li>
+        <li>H.-Y. Schive et al., <em>Understanding the core–halo relation of quantum wave dark matter from 3D simulations</em>, Phys. Rev. Lett. 113, 261302 (2014).</li>
+        <li>W. Hu, R. Barkana, A. Gruzinov, <em>Fuzzy cold dark matter: the wave properties of ultralight particles</em>, Phys. Rev. Lett. 85, 1158 (2000).</li>
+        <li>G. L. Bryan, M. L. Norman, <em>Statistical properties of X-ray clusters: analytic and numerical comparisons</em>, ApJ 495, 80 (1998).</li>
+        <li>L. Hui, J. P. Ostriker, S. Tremaine, E. Witten, <em>Ultralight scalars as cosmological dark matter</em>, Phys. Rev. D 95, 043541 (2017).</li>
+        <li>R. Löhner, <em>An adaptive finite element scheme for transient problems in CFD</em>, Comput. Methods Appl. Mech. Eng. 61, 323 (1987).</li>
+        <li>L. M. Widrow, N. Kaiser, <em>Using the Schrödinger equation to simulate collisionless matter</em>, ApJ 416, L71 (1993).</li>
+        <li>G. Strang, <em>On the construction and comparison of difference schemes</em>, SIAM J. Numer. Anal. 5, 506 (1968).</li>
+        <li>J. Lesgourgues, <em>The Cosmic Linear Anisotropy Solving System (CLASS) I: Overview</em>, arXiv:1104.2932 (2011).</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="row wide" style="max-width:calc(var(--rail) + var(--measure) + 16rem); margin:0 auto">
+    <div class="label">Colophon</div>
+    <div class="body">
+      Written by J. Fuentes Aguilar –– j.fuentesaguilar [at] gmail [dot] com <br>
+      Last updated 16th of September 2026
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

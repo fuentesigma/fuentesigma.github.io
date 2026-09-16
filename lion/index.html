@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en" data-entry="lion">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quantum machine learning with canonical variables</title>
+<meta name="description" content="A supervised learning scheme embedded in the exactly solvable dynamics of a trapped ion, where the time-varying trap field plays the role of the ansatz and regression and classification have closed-form predictors.">
+<meta name="author" content="J. Fuentes Aguilar">
+<meta property="og:title" content="Quantum machine learning with canonical variables">
+<meta property="og:description" content="Supervised learning embedded in the exactly solvable motion of a trapped ion, with the electromagnetic trap field as the learning hypothesis.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://fuentesigma.github.io/lion/">
+<link rel="canonical" href="https://fuentesigma.github.io/lion/">
+<meta property="og:image" content="https://fuentesigma.github.io/lion/figures/figure1.png">
+<meta property="og:image:alt" content="Position and momentum of a trapped ion, their phase portrait, and the regression fit on training and testing data">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="stylesheet" href="../style.css">
+
+<!-- KaTeX: math rendering, no build step. Pinned version. -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: "\\[", right: "\\]", display: true },
+        { left: "\\(", right: "\\)", display: false }
+      ],
+      macros: {
+        "\\dd": "\\mathrm{d}",
+        "\\ii": "\\mathrm{i}",
+        "\\lap": "\\nabla^2",
+        "\\avg": "\\langle #1 \\rangle",
+        "\\tr": "\\operatorname{Tr}"
+      },
+      ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+      throwOnError: false
+    });
+  });
+</script>
+</head>
+<body>
+
+<header class="bar">
+  <a class="home" href="../"><span class="dot"></span>J. Fuentes Aguilar<span class="sep">/</span>notes</a>
+  <nav>
+    <a class="up" href="../">index</a>
+    <a href="#scheme">scheme</a>
+    <a href="#solutions">solutions</a>
+    <a href="#regression">regression</a>
+    <a href="#classification">classification</a>
+    <a href="#scope">scope</a>
+  </nav>
+</header>
+
+<main id="top">
+
+<!-- ================================================================ HERO -->
+<div class="hero">
+  <div class="row wide">
+    <div class="label">Quantum Computing<br>2024 to 2026</div>
+    <div class="body">
+      <div class="eyebrow">Quantum machine learning</div>
+      <h1>Learning in the trap field of a confined ion</h1>
+      <p class="lede">A supervised learning scheme that replaces the parametrised quantum circuit with the time-varying electromagnetic potential of an ion trap. The motion of the ion under a quadratic confinement is exactly solvable, and both regression and classification acquire closed-form predictors written in the canonical observables themselves. Work carried out at the Luxembourg Centre for Systems Biomedicine, University of Luxembourg, and published in Quantum Machine Intelligence [1].</p>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ TOC -->
+<section style="padding-top:2.2rem">
+  <div class="row wide">
+    <div class="label">Index</div>
+    <div class="body">
+      <ol class="toc">
+        <li><a href="#scheme"><span class="n">01</span><span class="t">The trap field as the hypothesis</span></a></li>
+        <li><a href="#solutions"><span class="n">02</span><span class="t">Exact solutions and the admissible fields</span></a></li>
+        <li><a href="#regression"><span class="n">03</span><span class="t">Regression on canonical observables</span></a></li>
+        <li><a href="#classification"><span class="n">04</span><span class="t">Binary classification</span></a></li>
+        <li><a href="#scope"><span class="n">05</span><span class="t">Scope and limitations</span></a></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ 01 SCHEME -->
+<section id="scheme">
+  <div class="row">
+    <div class="label"><span class="num">01</span>Scheme</div>
+    <div class="body"><h2>The trap field as the hypothesis</h2></div>
+  </div>
+
+  <div class="row">
+    <div class="label"></div>
+    <div class="body">
+      <p>Variational quantum algorithms encode a learning model in a parametrised circuit and update the gate parameters through repeated evaluations on hardware. Two difficulties limit this route. Gradients of the cost function decrease exponentially as circuits deepen or as the number of qubits grows [3, 4], and the learned object, a list of gate angles, admits no direct physical reading.</p>
+
+      <p>The scheme described here removes the circuit. A single ion confined in a Paul trap [2] moves under a quadrupole potential whose amplitude is set by modulated voltages. Along one coordinate the motion is governed by a quadratic Hamiltonian in which the elastic field \(\beta(t)\) is the only free function.</p>
+      <div class="eq"><span class="tag">eq. 1</span>
+        \[ H_\beta = \frac{H}{\hbar\omega} = \frac{1}{2}p^2 + \frac{\beta(t)}{2}x^2 . \]
+      </div>
+      <p>Dimensionless variables are used throughout, obtained from \(t = \omega' t'\), \(p = \sqrt{1/m\omega\hbar}\,p'\) and \(x = \sqrt{m\omega/\hbar}\,x'\), under which the canonical quantisation reads \([x,p] = \ii\).</p>
+
+      <p>The proposal is to treat \(\beta(t)\) as the learning hypothesis. The trainable object becomes a voltage programme rather than a register of gate angles, and the prediction is read from the evolution of measurable observables. This differs from physics-informed machine learning, where a classical model is trained under physical constraints, and from hybrid variational methods, where parameters are updated through repeated circuit evaluations. Here the quantum dynamics is the learning mechanism.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ 02 SOLUTIONS -->
+<section id="solutions">
+  <div class="row">
+    <div class="label"><span class="num">02</span>Solutions</div>
+    <div class="body"><h2>Exact solutions and the admissible fields</h2></div>
+  </div>
+
+  <div class="row">
+    <div class="label"></div>
+    <div class="body">
+      <p>Because \(H_\beta\) is quadratic, the Heisenberg equations reduce to \(\dd x/\dd t = p\) and \(\dd p/\dd t = -\beta(t)x\), which carry the same structure in the classical and the quantum regime. The canonical pair \(Q = (x\;\;p)^\intercal\) therefore evolves by a linear transformation generated by a symplectic matrix.</p>
+      <div class="eq"><span class="tag">eq. 2</span>
+        \[ Q = u(t,t_0)\,Q_0, \qquad
+           \frac{\dd u(t,t_0)}{\dd t} = \Lambda(t)\,u(t,t_0), \quad u(t_0,t_0) = \mathbb{1},
+           \qquad \Lambda(t) = \operatorname{antidiag}\!\left(1, -\beta(t)\right). \]
+      </div>
+      <p>The trace \(\Gamma(t) = \tr u(t,t_0)\) classifies the motion. For \(|\Gamma| > 2\) the eigenvalues \(\kappa = (\Gamma \pm \sqrt{\Gamma^2-4})/2\) are real and the ion defocuses [6], for \(|\Gamma| = 2\) the system sits on a separatrix where stable motion remains possible [8], and for \(|\Gamma| < 2\) the eigenvalues are complex and the ion oscillates around the trap axis [9, 10, 11]. Only the third case is useful for learning, since a defocusing field loses the ion.</p>
+
+      <p>When \(\beta(t)\) is even over \([-\tau,\tau]\) the Cauchy problem in eq. 2 integrates in closed form without any adiabatic invariant [7, 8], and the evolution matrix is written in terms of a single real function \(\theta_\mathcal{P}(t)\) and its first derivative.</p>
+      <div class="eq"><span class="tag">eq. 3</span>
+        \[ u(t,-\tau) = \begin{pmatrix}
+             \dot\theta_\mathcal{P}(t) & \theta_\mathcal{P}(t) \\[0.35em]
+             \dfrac{\dot\theta^{\,2}_\mathcal{P}(t)-1}{\theta_\mathcal{P}(t)} & \dot\theta_\mathcal{P}(t)
+           \end{pmatrix}. \]
+      </div>
+      <p>The function \(\theta_\mathcal{P}(t)\) is almost arbitrary, subject to being non-singular and bounded on the interval and to two admissibility conditions. Where \(\theta_\mathcal{P}(t) = 0\) the derivative must satisfy \(\dot\theta_\mathcal{P}(t) = \pm 1\), which places the system at \(\Gamma = \pm 2\) and marks the thresholds at which stability switches. Where \(\beta(t)\) and \(\theta_\mathcal{P}(t)\) are both non-zero with vanishing first and second derivatives, the third derivative \(\dddot\theta_\mathcal{P}(t)\) must vanish, which identifies a momentary equilibrium of the motion.</p>
+
+      <p>The field is recovered from \(\theta_\mathcal{P}(t)\) by a second-order nonlinear equation whose right-hand side acts as an effective self-driving term.</p>
+      <div class="eq"><span class="tag">eq. 4</span>
+        \[ \ddot\theta_\mathcal{P}(t) + \frac{\beta(t)}{2}\,\theta_\mathcal{P}(t)
+           = \frac{\dot\theta^{\,2}_\mathcal{P}(t)-1}{2\,\theta_\mathcal{P}(t)} . \]
+      </div>
+      <p>For a constant field \(\beta(t) = \omega_0^2\) the solution is \(\theta_\mathcal{P}(t) = \sin(\omega_0 t)/\omega_0\) and eq. 3 becomes a symplectic rotation of period \(2\pi/\omega_0\).</p>
+
+      <p>This inverse ordering is what makes the scheme trainable. Optimising \(\beta(t)\) directly, through an unconstrained function or a neural network, produces fields that need not confine the ion. Optimising the coefficients of \(\theta_\mathcal{P}(t)\) instead and reading \(\beta(t)\) off eq. 4 keeps every candidate within the admissible class by construction, and bounds on \(\beta(t)\) translate into bounds on the parameter set \(\mathcal{P}\) that respect the voltage limits of the trap.</p>
+
+      <p>In the implementation the field is never written by hand. The ansatz is evaluated on a tensor with gradient tracking enabled and eq. 4 is applied through automatic differentiation.</p>
+
+      <div class="file"><span>iontrap.py, QuantumEvolution.beta (simplified)</span><span>field from ansatz</span></div>
+<pre><code>theta_t = self.theta(t_tensor)
+
+d_theta,  = torch.autograd.grad(theta_t, t_tensor,
+                grad_outputs=torch.ones_like(theta_t), create_graph=<span class="k">True</span>)
+dd_theta, = torch.autograd.grad(d_theta, t_tensor,
+                grad_outputs=torch.ones_like(d_theta), create_graph=<span class="k">True</span>)
+
+<span class="c"># theta = 0 is admissible only with d_theta = +-1 (Gamma = +-2)</span>
+zero_indices = torch.abs(theta_t) &lt; self.betadelta
+d_theta[zero_indices] = 1.0
+
+<span class="c"># eq. 4 solved for beta</span>
+num    = -(2 * dd_theta * theta_t - d_theta**2 + 1)
+beta_t = num / theta_t**2</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ 03 REGRESSION -->
+<section id="regression">
+  <div class="row">
+    <div class="label"><span class="num">03</span>Regression</div>
+    <div class="body"><h2>Regression on canonical observables</h2></div>
+  </div>
+
+  <div class="row">
+    <div class="label"></div>
+    <div class="body">
+      <p>A dataset \(\{t, \hat\Xi\}\) pairs time, the feature, with a target observable of the ion motion. The predictor follows from eq. 3 without any further approximation. Taking the coherent trajectory as the target, the predicted position at each sample is a linear combination of the ansatz and its derivative weighted by the initial conditions.</p>
+      <div class="eq"><span class="tag">eq. 5</span>
+        \[ x(t_j) = \hat x_0\,\dot\theta_\mathcal{P}(t_j) + \hat p_0\,\theta_\mathcal{P}(t_j),
+           \qquad
+           \mathcal{C}_R = \frac{1}{n}\sum_{j=1}^{n}\left(\hat x(t_j) - x(t_j)\right)^2 . \]
+      </div>
+      <p>The conjugate observable requires no separate training. Position and momentum evolve through the same \(\theta_\mathcal{P}(t)\) by eq. 3, and a fit to \(\hat x\) alone predicts \(\hat p\).</p>
+
+      <p>The ansatz is a truncated odd sine series, \(\theta_\mathcal{P}(t) = \sum_{j=1}^{N_\mathcal{P}} a_{2j-1}\sin([2j-1]t)\), with \(\mathcal{P} = \{a_{2j-1}\}\). The truncation enforces differentiability and fixes an explicit bandwidth. Three coefficients suffice for the example below.</p>
+
+      <p>The parameter space is scanned by Bayesian optimisation [12]. A Gaussian process prior is placed on the negative cost, updated at each iteration with the sampled pairs \((\Theta, -\mathrm{RMSE})\), and an expected improvement acquisition function proposes the next candidate. Training stops when the cost shows no further improvement, which keeps the model from memorising the training subset.</p>
+
+      <p>Synthetic data were produced from a field built as a superposition of four harmonics, \(\beta(t) = \sum_{j=0}^{3}\beta_j\cos(\omega_j t)\) with amplitudes \(25/24\), \(1/11\), \(37/36\) and \(1/12\) and frequencies \(0\), \(4/25\), \(2\) and \(4\). Integrating eq. 2 for this field gives complex eigenvalues and therefore focused motion. Applying the resulting evolution matrix to \((\hat x_0, \hat p_0) = (1,1)\) over \([-2\pi, 2\pi]\) at 500 uniform time points produces observables that return to their initial values at the end of the interval, an evolution loop. Gaussian noise at 10% was then added to both.</p>
+
+      <figure>
+        <img src="figures/figure1.png" alt="Four panels. Position and momentum against time, their closed phase portrait, and the regression prediction over noisy training and testing data" width="2000" height="1000" loading="lazy">
+        <figcaption class="caption"><span class="n">Fig. 1</span><span>Regression on the canonical variables. Panels A and B show the noiseless position and momentum evolved from \((1,1)\) and the corresponding phase portrait, which closes over the interval. Panels C and D show the fit against the noisy training and testing subsets, split 80:20, after 78 iterations. The coefficient of determination is 0.99 on both, with an RMSE of 0.143 and 0.14.</span></figcaption>
+      </figure>
+
+      <p>The trajectories in Fig. 1 are quantum expectation values of the canonical observables rather than deterministic classical paths [6, 14]. The additive Gaussian noise stands in for readout and estimation uncertainty, which is approximately normal when the estimates are formed from many repeated detection events.</p>
+
+      <p>The scheme extends beyond the canonical pair. The same exact solutions propagate a Gaussian wave packet, and the regression then runs on a spatio-temporal target.</p>
+
+      <figure>
+        <img src="figures/wavepacket.png" alt="Four contour panels of probability density against position and time, noisy targets on the left and recovered smooth densities on the right" width="2250" height="1500" loading="lazy">
+        <figcaption class="caption"><span class="n">Fig. 2</span><span>Regression on the probability density of a Gaussian wave packet under the same elastic field. Panels A and C are the noisy target densities on the training and testing subsets, panels B and D the densities reconstructed from the fitted \(\mathcal{P}\). The coefficient of determination is 0.99 in both cases. Detail in the supplemental materials of the paper.</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ 04 CLASSIFICATION -->
+<section id="classification">
+  <div class="row">
+    <div class="label"><span class="num">04</span>Classification</div>
+    <div class="body"><h2>Binary classification</h2></div>
+  </div>
+
+  <div class="row">
+    <div class="label"></div>
+    <div class="body">
+      <p>Classification discretises the target into classes under an arbitrary cutoff and leaves the dynamical core untouched. The trained observable is mapped to a probability by the logistic sigmoid, and the cost becomes the binary cross entropy.</p>
+      <div class="eq"><span class="tag">eq. 6</span>
+        \[ \Pi_j = \sigma\!\left(x(t_j)\right) = \frac{1}{1+e^{-x(t_j)}},
+           \qquad
+           \mathcal{C}_C = -\sum_{j=1}^{n}\left[\hat\Xi_j\log\Pi_j + (1-\hat\Xi_j)\log(1-\Pi_j)\right]. \]
+      </div>
+      <p>A sample is assigned to class 1 when \(\Pi \geq \Pi_\text{thr}\) and to class 0 otherwise, with the threshold at \(1/2\) for a balanced dataset. The predictor \(x(t_j)\) inside the sigmoid is still eq. 5, and the optimisation still runs over \(\mathcal{P}\).</p>
+
+      <p>The trajectory of Fig. 1 was split at its median into two balanced classes, with 30% Gaussian noise added to simulate harsher measurement conditions. The 500 points were divided into 400 for training and 100 for testing, using the same ansatz as the regression.</p>
+
+      <figure>
+        <img src="figures/figure2.png" alt="Four panels. Noisy labelled points, predicted class probabilities, a receiver operating characteristic curve, and a confusion matrix" width="2000" height="1000" loading="lazy">
+        <figcaption class="caption"><span class="n">Fig. 3</span><span>Binary classification of the noisy trajectory about its median. Panel A shows the labelled testing points, panel B the predicted probabilities after the sigmoid, panel C the receiver operating characteristic with an area of 0.993, and panel D the confusion matrix at \(\Pi_\text{thr} = 1/2\). Training converged in 52 iterations.</span></figcaption>
+      </figure>
+
+      <p>Multiclass problems follow by the standard reductions, either one against the rest with \(N\) classifiers or one against one with \(N(N-1)/2\) of them [13]. Nothing in eq. 3 changes.</p>
+
+      <p>At the physical level, an optimised \(\mathcal{P}\) defines a voltage programme. Any ion introduced into the trap with the prescribed initial conditions will then move in agreement with the learned target. For classification the same field predicts the time intervals over which the ion remains within a given spatial region.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ 05 SCOPE -->
+<section id="scope">
+  <div class="row">
+    <div class="label"><span class="num">05</span>Scope</div>
+    <div class="body"><h2>Scope and limitations</h2></div>
+  </div>
+
+  <div class="row">
+    <div class="label"></div>
+    <div class="body">
+      <p>No computational advantage is claimed. The optimisation loop demonstrated here is classical, with Bayesian optimisation proposing candidate parameters and updating a surrogate model on a classical cost. The quantum resources enter through a single evaluation, namely the preparation of an initial motional state, evolution under the prescribed \(\beta(t)\), and measurement of the relevant expectation values. Model selection and stopping criteria are classical post-processing.</p>
+
+      <p>Exactness and interpretability rest on the dynamics being quadratic and on the readout being an expectation value or another low-order moment. Expressivity is therefore restricted relative to non-Gaussian continuous-variable feature maps [5] or deep variational circuits. The examples treat a single mode along a single coordinate.</p>
+
+      <p>The noise model is additive and Gaussian. More realistic models can be accommodated without touching the dynamical core, by replacing the RMSE or the cross entropy with a weighted or robust objective, or with an explicit likelihood that scores candidate parameters against the measurement statistics.</p>
+
+      <p>Experimental realisation remains the open step. The scheme prescribes a field that is admissible by construction, and demonstrating the learning operations on trap hardware is the natural continuation.</p>
+
+      <h3>Code and data</h3>
+      <p>Three modules carry the work. <code>iontrap.py</code> holds the evolution machinery, with the ansatz, the field recovered through eq. 4, the symplectic matrix of eq. 3 and the Gaussian wave packet. <code>canonicalRegressor.py</code> and <code>canonicalClassifier.py</code> hold the two learning algorithms, each with its objective, its admissibility constraints on \(\theta_\mathcal{P}(t)\) and its Bayesian fitting loop over <code>botorch</code>. The synthetic datasets are distributed as CSV files named by the trap parameters that generated them. Everything reproducing the figures is available in the supplemental materials of the paper [1].</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ REFS -->
+<section id="refs">
+  <div class="row">
+    <div class="label">References</div>
+    <div class="body">
+      <ol class="refs">
+        <li>J. Fuentes, <em>Quantum machine learning with canonical variables</em>, Quantum Machine Intelligence 8, 19 (2026). <a href="https://doi.org/10.1007/s42484-026-00373-w">10.1007/s42484-026-00373-w</a></li>
+        <li>W. Paul, <em>Electromagnetic traps for charged and neutral particles</em>, Rev. Mod. Phys. 62, 531 (1990).</li>
+        <li>J. R. McClean, S. Boixo, V. N. Smelyanskiy, R. Babbush, H. Neven, <em>Barren plateaus in quantum neural network training landscapes</em>, Nature Communications 9, 4812 (2018).</li>
+        <li>M. Cerezo et al., <em>Variational quantum algorithms</em>, Nature Reviews Physics 3, 625 (2021).</li>
+        <li>N. Killoran, T. R. Bromley, J. M. Arrazola, M. Schuld, N. Quesada, S. Lloyd, <em>Continuous-variable quantum neural networks</em>, Phys. Rev. Research 1, 033063 (2019).</li>
+        <li>J. Fuentes, <em>Unraveling soft squeezing transformations in time-variant elastic fields</em>, Dynamics 3, 299 (2023).</li>
+        <li>B. Mielnik, <em>Quantum operations: technical or fundamental challenge?</em>, J. Phys. A 46, 385301 (2013).</li>
+        <li>B. Mielnik, <em>Quantum control: discovered, repeated and reformulated ideas mark the progress</em>, J. Phys. Conf. Ser. 512, 012035 (2014).</li>
+        <li>B. Mielnik, A. Ram&iacute;rez, <em>Ion traps: some semiclassical observations</em>, Physica Scripta 82, 055002 (2010).</li>
+        <li>B. Mielnik, A. Ram&iacute;rez, <em>Magnetic operations: a little fuzzy mechanics?</em>, Physica Scripta 84, 045008 (2011).</li>
+        <li>J. Fuentes, <em>Quantum control operations with fuzzy evolution trajectories based on polyharmonic magnetic fields</em>, Scientific Reports 10, 22256 (2020).</li>
+        <li>J. Mockus, <em>Application of Bayesian approach to numerical methods of global and stochastic optimization</em>, J. Global Optim. 4, 347 (1994).</li>
+        <li>R. Rifkin, A. Klautau, <em>In defense of one-vs-all classification</em>, J. Mach. Learn. Res. 5, 101 (2004).</li>
+        <li>B. Mielnik, J. Fuentes, <em>On the exactly solvable squeezing in symmetric evolution intervals</em>, in Geometric Methods in Physics XL, 413, Springer (2024).</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="row wide" style="max-width:calc(var(--rail) + var(--measure) + 16rem); margin:0 auto">
+    <div class="label">Colophon</div>
+    <div class="body">
+      Written by J. Fuentes Aguilar –– j.fuentesaguilar [at] gmail [dot] com <br>
+      Last updated 16th of September 2026
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

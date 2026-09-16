@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>J. Fuentes Aguilar</title>
+<meta name="description" content="Notes on computational physics and quantum machine learning. Numerical methods, exactly solvable dynamics and the code that implements them.">
+<meta name="author" content="J. Fuentes Aguilar">
+<meta property="og:title" content="J. Fuentes Aguilar">
+<meta property="og:description" content="Notes on computational physics and quantum machine learning.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://fuentesigma.github.io/">
+<link rel="canonical" href="https://fuentesigma.github.io/">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="bar">
+  <a class="home" href="./"><span class="dot"></span>J. Fuentes Aguilar<span class="sep">/</span>notes</a>
+  <nav>
+    <a href="#entries">entries</a>
+  </nav>
+</header>
+
+<main id="top">
+
+<div class="site-hero">
+  <div class="row wide">
+    <div class="label">Physics<br>Scientific computing</div>
+    <div class="body">
+      <h1>Notes</h1>
+      <p class="lede">Working notes on computational physics and quantum machine learning. Each entry describes a piece of work in the terms in which it was done, with the equations that define the problem, the numerical scheme that solves it, and the results that test the implementation.</p>
+    </div>
+  </div>
+</div>
+
+<section id="entries">
+  <div class="row wide">
+    <div class="label">Entries</div>
+    <div class="body">
+      <ul class="entries">
+
+        <li data-entry="psidm">
+          <a class="entry" href="psidm/">
+            <div class="meta"><span class="year">2014 &ndash; 2026</span>Cosmology</div>
+            <div>
+              <h2>Evolving the dark universe as a single wave</h2>
+              <p>A solver for the Schr&ouml;dinger&ndash;Poisson equations in an expanding universe. Pseudo-spectral integration on the root grid, finite differences on adaptively refined patches, GPU and MPI support. Started as a master&rsquo;s thesis at CINVESTAV-IPN and rebuilt since.</p>
+              <span class="status">Code, unpublished</span>
+            </div>
+          </a>
+        </li>
+
+        <li data-entry="lion">
+          <a class="entry" href="lion/">
+            <div class="meta"><span class="year">2024 &ndash; 2026</span>Quantum computing</div>
+            <div>
+              <h2>Learning in the trap field of a confined ion</h2>
+              <p>Supervised learning embedded in the exactly solvable motion of a trapped ion. The time-varying trap field replaces the parametrised circuit as the learning hypothesis, and regression and classification acquire closed-form predictors in the canonical observables.</p>
+              <span class="status">Paper and code</span>
+            </div>
+          </a>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="row wide" style="max-width:calc(var(--rail) + var(--measure) + 16rem); margin:0 auto">
+    <div class="label">Colophon</div>
+    <div class="body">
+      J. Fuentes Aguilar &ndash;&ndash; j.fuentesaguilar [at] gmail [dot] com <br>
+      Last updated 16th of September 2026
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

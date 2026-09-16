@@ -1,0 +1,183 @@
+<!doctype html>
+<!--
+  ENTRY SKELETON. Copy this directory to <slug>/ and fill it in.
+  Every REPLACE marker below must be resolved before publishing.
+  See README.md at the repository root for the four steps.
+-->
+<html lang="en" data-entry="REPLACE-slug">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>REPLACE entry title</title>
+<meta name="description" content="REPLACE one or two sentences describing the entry.">
+<meta name="author" content="J. Fuentes Aguilar">
+<meta property="og:title" content="REPLACE entry title">
+<meta property="og:description" content="REPLACE one sentence for link previews.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://fuentesigma.github.io/REPLACE-slug/">
+<link rel="canonical" href="https://fuentesigma.github.io/REPLACE-slug/">
+<meta property="og:image" content="https://fuentesigma.github.io/REPLACE-slug/figures/REPLACE-poster.png">
+<meta property="og:image:alt" content="REPLACE description of the poster image for screen readers.">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="stylesheet" href="../style.css">
+
+<!-- KaTeX: math rendering, no build step. Pinned version.
+     Delete this block if the entry carries no mathematics. -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: "\\[", right: "\\]", display: true },
+        { left: "\\(", right: "\\)", display: false }
+      ],
+      macros: {
+        "\\dd": "\\mathrm{d}",
+        "\\ii": "\\mathrm{i}",
+        "\\lap": "\\nabla^2",
+        "\\avg": "\\langle #1 \\rangle",
+        "\\tr": "\\operatorname{Tr}"
+      },
+      ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+      throwOnError: false
+    });
+  });
+</script>
+</head>
+<body>
+
+<header class="bar">
+  <a class="home" href="../"><span class="dot"></span>J. Fuentes Aguilar<span class="sep">/</span>notes</a>
+  <nav>
+    <a class="up" href="../">index</a>
+    <a href="#one">REPLACE</a>
+    <a href="#two">REPLACE</a>
+    <a href="#three">REPLACE</a>
+  </nav>
+</header>
+
+<main id="top">
+
+<!-- ================================================================ HERO -->
+<div class="hero">
+  <div class="row wide">
+    <div class="label">REPLACE field<br>REPLACE years</div>
+    <div class="body">
+      <div class="eyebrow">REPLACE subject</div>
+      <h1>REPLACE entry title</h1>
+      <p class="lede">REPLACE. Three to five sentences. What the work is, what it computes, where it was done.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ TOC -->
+<section style="padding-top:2.2rem">
+  <div class="row wide">
+    <div class="label">Index</div>
+    <div class="body">
+      <ol class="toc">
+        <li><a href="#one"><span class="n">01</span><span class="t">REPLACE</span></a></li>
+        <li><a href="#two"><span class="n">02</span><span class="t">REPLACE</span></a></li>
+        <li><a href="#three"><span class="n">03</span><span class="t">REPLACE</span></a></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ 01 -->
+<section id="one">
+  <div class="row">
+    <div class="label"><span class="num">01</span>REPLACE</div>
+    <div class="body"><h2>REPLACE section title</h2></div>
+  </div>
+
+  <div class="row">
+    <div class="label"></div>
+    <div class="body">
+
+      <p>Body text. Keep paragraphs inside <code>.body</code> and the rail empty on continuation rows.</p>
+
+      <!-- Numbered equation. The tag is written by hand, KaTeX does not number. -->
+      <div class="eq"><span class="tag">eq. 1</span>
+        \[ REPLACE \]
+      </div>
+
+      <!-- Code excerpt. The .file bar joins the block below it. -->
+      <div class="file"><span>REPLACE path/to/file.py</span><span>REPLACE role</span></div>
+<pre><code><span class="k">def</span> example(x):
+    <span class="c"># comment</span>
+    <span class="k">return</span> x</code></pre>
+
+      <!-- Figure. Always give width, height and alt. -->
+      <figure>
+        <img src="figures/REPLACE.svg" alt="REPLACE description for screen readers" width="560" height="280" loading="lazy">
+        <figcaption class="caption"><span class="n">Fig. 1</span><span>REPLACE caption.</span></figcaption>
+      </figure>
+
+      <!-- Table. Wrap it so it scrolls on a phone instead of widening the page. -->
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>REPLACE</th><th>REPLACE</th></tr></thead>
+          <tbody>
+            <tr><td>REPLACE</td><td class="num">0.00</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ 02 -->
+<section id="two">
+  <div class="row">
+    <div class="label"><span class="num">02</span>REPLACE</div>
+    <div class="body"><h2>REPLACE section title</h2></div>
+  </div>
+  <div class="row">
+    <div class="label"></div>
+    <div class="body"><p>REPLACE</p></div>
+  </div>
+</section>
+
+<!-- ================================================================ 03 -->
+<section id="three">
+  <div class="row">
+    <div class="label"><span class="num">03</span>REPLACE</div>
+    <div class="body"><h2>REPLACE section title</h2></div>
+  </div>
+  <div class="row">
+    <div class="label"></div>
+    <div class="body"><p>REPLACE</p></div>
+  </div>
+</section>
+
+<!-- ================================================================ REFS -->
+<section id="refs">
+  <div class="row">
+    <div class="label">References</div>
+    <div class="body">
+      <ol class="refs">
+        <li>REPLACE author, <em>title</em>, journal volume, page (year).</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="row wide" style="max-width:calc(var(--rail) + var(--measure) + 16rem); margin:0 auto">
+    <div class="label">Colophon</div>
+    <div class="body">
+      Written by J. Fuentes Aguilar &ndash;&ndash; j.fuentesaguilar [at] gmail [dot] com <br>
+      Last updated REPLACE
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
