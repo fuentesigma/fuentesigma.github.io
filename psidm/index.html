@@ -435,6 +435,9 @@ denom = 1.0 + 6.0 * alpha
         <li>The MPI layer has been verified with a single rank only. The ghost-cell exchange between several ranks has not yet been run on a system with <code>mpi4py</code>.</li>
         <li>The Bogoliubov solver of the side study in <code>fdm_qg/</code> reproduces its analytic references, but its quantum-gravity operator is only real-linear. Its eigenvalues require the 2×2 \((u,v)\) formulation before they can be used.</li>
       </ul>
+
+      <h3>Code</h3>
+      <p>The solver, the test bench and the reproducible soliton test are at <a href="https://github.com/fuentesigma/psidm-solver">github.com/fuentesigma/psidm-solver</a> under GPL-3.0. The bench there reports 22 passed, 5 warnings and 1 skipped on a machine without <code>mpi4py</code>, the skip being the multi-rank path. The Bogoliubov side study is not part of that package.</p>
     </div>
   </div>
 </section>

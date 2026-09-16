@@ -227,7 +227,7 @@ beta_t = num / theta_t**2</code></pre>
       <p>Experimental realisation remains the open step. The scheme prescribes a field that is admissible by construction, and demonstrating the learning operations on trap hardware is the natural continuation.</p>
 
       <h3>Code and data</h3>
-      <p>Three modules carry the work. <code>iontrap.py</code> holds the evolution machinery, with the ansatz, the field recovered through eq. 4, the symplectic matrix of eq. 3 and the Gaussian wave packet. <code>canonicalRegressor.py</code> and <code>canonicalClassifier.py</code> hold the two learning algorithms, each with its objective, its admissibility constraints on \(\theta_\mathcal{P}(t)\) and its Bayesian fitting loop over <code>botorch</code>. The synthetic datasets are distributed as CSV files named by the trap parameters that generated them. Everything reproducing the figures is available in the supplemental materials of the paper [1].</p>
+      <p>Three modules carry the work. <code>iontrap.py</code> holds the evolution machinery, with the ansatz, the field recovered through eq. 4, the symplectic matrix of eq. 3 and the Gaussian wave packet. <code>canonicalRegressor.py</code> and <code>canonicalClassifier.py</code> hold the two learning algorithms, each with its objective, its admissibility constraints on \(\theta_\mathcal{P}(t)\) and its Bayesian fitting loop over <code>botorch</code>. The synthetic datasets are distributed as CSV files named by the trap parameters that generated them. Everything reproducing the figures is available in the supplemental materials of the paper [1], and the code and datasets are at <a href="https://github.com/fuentesigma/ionlearning">github.com/fuentesigma/ionlearning</a>.</p>
     </div>
   </div>
 </section>
