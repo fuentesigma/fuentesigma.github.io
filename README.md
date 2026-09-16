@@ -1,8 +1,6 @@
 # fuentesigma.github.io
 
-Static site served by GitHub Pages at <https://fuentesigma.github.io/>. No build
-step, no generator, no dependencies. `.nojekyll` tells Pages to serve the files
-exactly as they are.
+Static site served by GitHub Pages at <https://fuentesigma.github.io/>.
 
 ```
 index.html          landing page, the list of entries
@@ -15,7 +13,7 @@ lion/               quantum machine learning with canonical variables
 
 ## Adding an entry
 
-Three steps. Nothing else in the repository needs to change.
+This is for me to remember each time...
 
 **1. Copy the skeleton.**
 
