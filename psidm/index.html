@@ -44,25 +44,16 @@
 
 <header class="bar">
   <a class="home" href="../"><span class="dot"></span>J. Fuentes Aguilar<span class="sep">/</span>notes</a>
-  <nav>
-    <a class="up" href="../">index</a>
-    <a href="#model">model</a>
-    <a href="#numerics">numerics</a>
-    <a href="#engine">code</a>
-    <a href="#results">results</a>
-    <a href="#limits">limitations</a>
-  </nav>
 </header>
 
-<main id="top">
+<main class="flow" id="top">
 
 <!-- ================================================================ HERO -->
 <div class="hero">
   <div class="row wide">
-    <div class="label">Scientific Computing<br>2014 to 2026</div>
     <div class="body">
-      <div class="eyebrow">Cosmology</div>
       <h1>Evolving the dark universe as a single wave (<span class="psi">ψ</span>DM)</h1>
+      <div class="year">2014 &ndash; 2026</div>
       <p class="lede">A solver for the Schrödinger–Poisson equations in an expanding universe to model large-scale structure formation. The code starts from the matter power spectrum at redshift 1000 and follows the dark matter wavefunction as it collapses into halos with solitonic cores. It combines a pseudo-spectral method on the root grid with finite differences on adaptively refined patches, and it runs on GPUs and across MPI ranks. The project began as my master's thesis at CINVESTAV-IPN, Mexico, in 2014. The code has since been rebuilt and systematically tested.</p>
     </div>
   </div>
@@ -71,7 +62,6 @@
 <!-- ================================================================ TOC -->
 <section style="padding-top:2.2rem">
   <div class="row wide">
-    <div class="label">Index</div>
     <div class="body">
       <ol class="toc">
         <li><a href="#model"><span class="n">01</span><span class="t">Wave dark matter and its equations</span></a></li>
@@ -87,13 +77,9 @@
 <!-- ================================================================ 01 MODEL -->
 <section id="model">
   <div class="row">
-    <div class="label"><span class="num">01</span>Model</div>
-    <div class="body"><h2>Wave dark matter and its equations</h2></div>
-  </div>
-
-  <div class="row">
-    <div class="label"></div>
     <div class="body">
+      <h2>Wave dark matter and its equations</h2>
+
       <p>The cold dark matter (CDM) model reproduces the large-scale distribution of matter in the universe. Its predictions on galactic scales are less satisfactory. Collisionless simulations produce halos with central density cusps, whereas the rotation curves of many dwarf galaxies are consistent with constant-density cores. The same simulations predict more subhalos than the number of satellites observed around the Milky Way.</p>
       <p>Wave dark matter, also called fuzzy dark matter, addresses these discrepancies with a boson of mass \(m \sim 10^{-22}\,\mathrm{eV}\) [3, 5]. The de Broglie wavelength of such a particle is of the order of a kiloparsec. At galactic occupation numbers the dark matter is described by a classical field \(\psi\) that obeys the Schrödinger–Poisson equations [7]. Quantum pressure suppresses gravitational collapse below a Jeans length, and every halo develops a stationary core, the soliton, embedded in an envelope of interference granules [1, 2]. A simulation must resolve the local de Broglie wavelength throughout the volume. This requirement motivates the adaptive grids described in §02.</p>
 
@@ -142,13 +128,9 @@
 <!-- ================================================================ 02 NUMERICS -->
 <section id="numerics">
   <div class="row">
-    <div class="label"><span class="num">02</span>Numerics</div>
-    <div class="body"><h2>Discretisation and adaptive refinement</h2></div>
-  </div>
-
-  <div class="row">
-    <div class="label"></div>
     <div class="body">
+      <h2>Discretisation and adaptive refinement</h2>
+
       <p>The Hamiltonian in eq. 4 separates into a kinetic term, diagonal in Fourier space, and a potential term, diagonal in real space. Strang splitting [8] applies a half potential kick, a full kinetic drift and a second half kick.</p>
       <div class="eq"><span class="tag">eq. 7</span>
         \[ \psi^{n+1} = e^{-\ii\, a V^{\ast}\,\Delta\tau/2}\;
@@ -209,7 +191,6 @@ denom = 1.0 + 6.0 * alpha
   </div>
 
   <div class="row wide">
-    <div class="label"></div>
     <div class="body">
       <figure>
         <img src="figures/dispersion.svg" alt="Ratio of numerical to exact dispersion versus k dx for spectral, finite-difference and Crank-Nicolson schemes" width="560" height="280" loading="lazy">
@@ -219,7 +200,6 @@ denom = 1.0 + 6.0 * alpha
   </div>
 
   <div class="row">
-    <div class="label"></div>
     <div class="body">
       <p>Every level advances with the timestep</p>
       <div class="eq"><span class="tag">eq. 12</span>
@@ -259,13 +239,9 @@ denom = 1.0 + 6.0 * alpha
 <!-- ================================================================ 03 ENGINE -->
 <section id="engine">
   <div class="row">
-    <div class="label"><span class="num">03</span>Code</div>
-    <div class="body"><h2>Engine and cosmological interface</h2></div>
-  </div>
-
-  <div class="row">
-    <div class="label"></div>
     <div class="body">
+      <h2>Engine and cosmological interface</h2>
+
       <p>The engine is written in PyTorch, and the same code runs on NVIDIA GPUs, Apple silicon and CPUs. The kick, drift and Poisson kernels are compiled with <code>torch.compile</code> when CUDA is available. Physics, numerics and parallelism reside in separate modules, and each module can be tested in isolation.</p>
       <div class="table-wrap"><table>
         <thead><tr><th>Module</th><th>Content</th></tr></thead>
@@ -307,7 +283,6 @@ denom = 1.0 + 6.0 * alpha
   </div>
 
   <div class="row wide">
-    <div class="label"></div>
     <div class="body">
       <div class="table-wrap"><table>
         <thead><tr><th> Parameter </th><th>Role in the code</th><th>Default and derived value</th></tr></thead>
@@ -326,7 +301,6 @@ denom = 1.0 + 6.0 * alpha
   </div>
 
   <div class="row">
-    <div class="label"></div>
     <div class="body">
       <p>The boson mass, the Hubble constant and the matter density enter the code through <code>physical_units</code> in <code>engine/cosmology.py</code>, which returns the units \(L_0\) and \(T_0\). The class <code>MPISchrodingerPoisson</code> in <code>engine/simulation.py</code> converts the box size to code units, evaluates the expansion rate with \(\Omega_{\Lambda 0}\) in its method <code>da_dtau</code> and advances the scale factor in <code>advance_a</code>. The initial redshift fixes the starting scale factor of the root level in <code>engine/parallel/level.py</code>. The power spectrum is sampled in <code>wavefunction_ic</code> in <code>engine/grids.py</code> and in its distributed counterpart <code>MPILevel._generate_ic</code>, and the growth rate that sets the phase of \(\psi\) is computed in <code>velocities_cosmo</code> in <code>engine/cosmology.py</code>. The virial overdensity is defined in the class <code>Units</code> in <code>engine/halos.py</code>.</p>
 
@@ -345,7 +319,6 @@ denom = 1.0 + 6.0 * alpha
   </div>
 
   <div class="row wide">
-    <div class="label"></div>
     <div class="body">
       <figure>
         <img src="figures/ic_power_spectrum.svg" alt="Wave dark matter power spectrum at z=1000 with a sharp cutoff near 6 per Mpc. The grey band shows the wavenumbers resolved by a 4 Mpc, 128 cubed box" width="560" height="300" loading="lazy">
@@ -355,7 +328,6 @@ denom = 1.0 + 6.0 * alpha
   </div>
 
   <div class="row">
-    <div class="label"></div>
     <div class="body">
       <p>The conversion to physical units takes place at output. The class <code>halos.Units</code> converts code densities to \(M_\odot\,\mathrm{pc}^{-3}\) and cells to proper kpc at the current \(a\). It also computes the virial overdensity of Bryan and Norman [4], and cores are fitted with the soliton profile of Schive et al. [1].</p>
       <div class="eq"><span class="tag">eq. 18</span>
@@ -370,13 +342,9 @@ denom = 1.0 + 6.0 * alpha
 <!-- ================================================================ 04 RESULTS -->
 <section id="results">
   <div class="row">
-    <div class="label"><span class="num">04</span>Results</div>
-    <div class="body"><h2>Results and validation</h2></div>
-  </div>
-
-  <div class="row">
-    <div class="label"></div>
     <div class="body">
+      <h2>Results and validation</h2>
+
       <h3 style="margin-top:0">Soliton formation</h3>
       <p>This test does not involve cosmology. Eight Gaussian concentrations of wave matter with random phases are placed in a periodic box with \(G = 1\). The initial state contains no soliton. The system collapses, relaxes and forms a central core.</p>
       <p>The scaling invariance of eq. 6 gives a prediction without free parameters. The ground state computed by imaginary-time evolution fixes \(C = \rho_c r_c^4 = 0.2429\), and any soliton must then satisfy \(r_c = (C/\rho_c)^{1/4}\) independently of its mass. The core formed in the simulation is fitted at every snapshot, and its radius is compared with this prediction.</p>
@@ -385,7 +353,6 @@ denom = 1.0 + 6.0 * alpha
   </div>
 
   <div class="row wide">
-    <div class="label"></div>
     <div class="body">
       <figure>
         <img src="figures/soliton_profile.svg" alt="Radial density profile of the formed core with Schive fit and rescaled ground state overlapping to r of about 3, followed by a power-law envelope" width="707" height="462" loading="lazy">
@@ -410,7 +377,6 @@ denom = 1.0 + 6.0 * alpha
   </div>
 
   <div class="row">
-    <div class="label"></div>
     <div class="body">
       <div class="table-wrap"><table>
         <thead><tr><th>Quantity</th><th>Value</th></tr></thead>
@@ -431,7 +397,6 @@ denom = 1.0 + 6.0 * alpha
   </div>
 
   <div class="row wide">
-    <div class="label"></div>
     <div class="body">
       <div class="table-wrap"><table>
         <thead><tr><th>Component</th><th>Test</th><th>Result</th></tr></thead>
@@ -458,12 +423,9 @@ denom = 1.0 + 6.0 * alpha
 <!-- ================================================================ 05 LIMITS -->
 <section id="limits">
   <div class="row">
-    <div class="label"><span class="num">05</span>Limitations</div>
-    <div class="body"><h2>Limitations and next steps</h2></div>
-  </div>
-  <div class="row">
-    <div class="label"></div>
     <div class="body">
+      <h2>Limitations and next steps</h2>
+
       <p>The following issues are reported by the test bench and remain open.</p>
       <ul>
         <li>The soliton test at 128³ is at the limit of its resolution. At maximum compression the core radius of the formed soliton spans 4.4 cells, compared with 6.0 cells for the reference ground state. The measured core radius agrees with the prediction, but convergence has not been demonstrated at 256³.</li>
@@ -480,8 +442,8 @@ denom = 1.0 + 6.0 * alpha
 <!-- ================================================================ REFERENCES -->
 <section id="refs">
   <div class="row">
-    <div class="label">References</div>
     <div class="body">
+      <h2>References</h2>
       <ol class="refs">
         <li>H.-Y. Schive, T. Chiueh, T. Broadhurst, <em>Cosmic structure as the quantum interference of a coherent dark wave</em>, Nature Physics 10, 496 (2014).</li>
         <li>H.-Y. Schive et al., <em>Understanding the core–halo relation of quantum wave dark matter from 3D simulations</em>, Phys. Rev. Lett. 113, 261302 (2014).</li>
@@ -501,7 +463,6 @@ denom = 1.0 + 6.0 * alpha
 
 <footer>
   <div class="row wide" style="max-width:calc(var(--rail) + var(--measure) + 16rem); margin:0 auto">
-    <div class="label">Colophon</div>
     <div class="body">
       Written by J. Fuentes Aguilar –– j.fuentesaquilar [at] gmail [dot] com <br>
       Last updated 16th of September 2026

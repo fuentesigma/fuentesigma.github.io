@@ -58,10 +58,6 @@ a:hover { text-decoration-color: var(--accent); }
 .bar a { text-decoration: none; }
 .bar .dot { display: inline-block; width: 0.55em; height: 0.55em; border-radius: 50%;
             background: var(--accent); margin-right: 0.5em; vertical-align: 0.05em; }
-.bar nav { display: flex; gap: 1.2rem; flex-wrap: wrap; justify-content: flex-end; }
-.bar nav a { color: var(--muted); }
-.bar nav a:hover { color: var(--ink); }
-@media (max-width: 600px) { .bar nav { display: none; } }
 
 /* ---------- page grid: label rail + text column ---------- */
 
@@ -84,7 +80,7 @@ main { max-width: calc(var(--rail) + var(--measure) + 16rem); margin: 0 auto; }
   .row > .label { margin-bottom: 0.4rem; }
 }
 
-.label, .eyebrow, .caption .n, th, .toc .n, .tag {
+.label, .caption .n, th, .toc .n, .tag {
   font: 500 11px/1.5 var(--mono);
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -118,12 +114,12 @@ section { padding-block: 3.5rem 1rem; border-bottom: 1px solid var(--rule); }
 section:last-of-type { border-bottom: 0; }
 
 section > .row:first-child { margin-bottom: 1.5rem; }
+main.flow section > .row:first-child { margin-bottom: 0; }
 h2 {
   margin: 0; font-weight: 500; font-size: clamp(1.6rem, 3.2vw, 2.3rem);
   line-height: 1.05; letter-spacing: -0.025em;
 }
 h3 { margin: 2.4rem 0 0.6rem; font-size: 1.05rem; font-weight: 600; letter-spacing: -0.005em; }
-.label .num { display: block; color: var(--ink); font-size: 13px; }
 
 p { margin: 0 0 1rem; }
 .body > p, .body > ul, .body > ol { max-width: var(--measure); }
@@ -183,13 +179,6 @@ td code { white-space: nowrap; }
 td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
 td.math { white-space: nowrap; }
 
-.st { font: 600 10.5px/1 var(--mono); letter-spacing: 0.06em; padding: 0.25em 0.45em;
-      border-radius: 2px; color: #fff; white-space: nowrap; }
-.st.pass { background: var(--pass); }
-.st.warn { background: var(--warn); }
-.st.fail { background: var(--fail); }
-.st.skip { background: var(--muted); }
-
 /* ---------- figures ---------- */
 
 figure { margin: 1.8rem 0 2.2rem; }
@@ -204,23 +193,7 @@ figure.square { max-width: 28rem; }             /* square image at roughly the h
             align-items: end; }
 @media (max-width: 700px) { .fig-pair { grid-template-columns: minmax(0, 1fr); } }
 
-.pending {
-  display: grid; place-items: center; aspect-ratio: 16 / 9; max-width: 100%;
-  border: 1px dashed var(--muted); background:
-    repeating-linear-gradient(135deg, transparent 0 10px, rgba(0,0,0,0.025) 10px 20px);
-  font: 500 11px/1.5 var(--mono); letter-spacing: 0.06em; text-transform: uppercase;
-  color: var(--muted); text-align: center; padding: 1rem;
-}
-
 /* ---------- key numbers ---------- */
-
-.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
-         border-top: 1px solid var(--ink); margin: 1.5rem 0 2rem; }
-.stats div { padding: 0.9rem 1rem 1rem 0; border-bottom: 1px solid var(--rule); }
-.stats .v { display: block; font-size: 1.7rem; font-weight: 500; letter-spacing: -0.02em;
-            line-height: 1.1; font-variant-numeric: tabular-nums; }
-.stats .v small { font-size: 0.55em; color: var(--muted); font-weight: 400; }
-.stats .k { display: block; margin-top: 0.3rem; font-size: 12.5px; color: var(--ink-2); line-height: 1.35; }
 
 /* ---------- notes ---------- */
 
@@ -229,18 +202,6 @@ figure.square { max-width: 28rem; }             /* square image at roughly the h
 .note::before { content: ""; display: inline-block; width: 0.55em; height: 0.55em; margin-right: 0.6em;
                 background: var(--accent); vertical-align: 0.05em; }
 .note p:last-child { margin-bottom: 0; }
-
-.todo { background: #fff2c2; border-bottom: 1px dashed var(--warn); padding: 0 0.15em; }
-
-/* ---------- pipeline diagram ---------- */
-
-.pipe { display: grid; grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr)); gap: 0;
-        margin: 1.4rem 0 1.8rem; counter-reset: step; }
-.pipe div { position: relative; padding: 0.8rem 1.4rem 0.9rem 0.9rem; border: 1px solid var(--ink);
-            margin: 0 -1px -1px 0; background: var(--card); font-size: 13px; line-height: 1.35; }
-.pipe div::before { counter-increment: step; content: "0" counter(step); display: block;
-                    font: 500 10.5px/1.6 var(--mono); color: var(--accent); }
-.pipe code { font-size: 11.5px; }
 
 /* ---------- references / footer ---------- */
 
@@ -274,11 +235,23 @@ footer .row { row-gap: 0.5rem; }
    pages do not recolour themselves. */
 
 /* ---------- site navigation ----------
-   .bar .home is the link back to the index, present on every entry. */
+   The only navigation is the link back to the index, top left. */
 
 .bar .home { display: inline-flex; align-items: baseline; gap: 0.55em; }
 .bar .home .sep { color: var(--rule); }
-.bar nav a.up { color: var(--ink); }
+
+/* ---------- entry pages ----------
+   One column. No label rail, no section numbers, no section subtitles.
+   The .row and .body wrappers are kept so that everything hanging off
+   .body (paragraph measure, figures, tables) keeps its widths. */
+
+main.flow { max-width: calc(var(--measure) + 14rem); }
+main.flow .row { display: block; }
+main.flow .row > .body,
+main.flow .row.wide > .body { max-width: 100%; }
+main.flow h2 { margin-bottom: 1.3rem; }
+main.flow .hero .year { margin: 0 0 1.4rem; font: 500 11px/1.6 var(--mono);
+                        letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
 
 /* ---------- landing page ---------- */
 

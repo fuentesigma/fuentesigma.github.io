@@ -31,10 +31,14 @@ Pick a short lowercase slug with no spaces. It becomes the URL,
 marker. The skeleton carries one example of each construction the design
 system provides.
 
+Every entry page is one column. `<main class="flow">` switches off the label
+rail, and there are no section numbers, no section subtitles and no menu. The
+only navigation is the link back to the index in the top left corner, and the
+table of contents under the abstract.
+
 | construction | markup |
 | --- | --- |
-| section with a rail label | `<section id>` holding `.row` > `.label` + `.body` |
-| continuation row | `.row` with an empty `.label` |
+| section | `<section id>` holding `.row` > `.body`, with the `<h2>` first inside `.body` |
 | numbered equation | `.eq` with a hand-written `.tag` |
 | code excerpt | `.file` bar followed immediately by `<pre><code>` |
 | figure | `<figure>` with `<img>` and `figcaption.caption` |
