@@ -31,10 +31,14 @@ Pick a short lowercase slug with no spaces. It becomes the URL,
 marker. The skeleton carries one example of each construction the design
 system provides.
 
-Every entry page is one column. `<main class="flow">` switches off the label
-rail, and there are no section numbers, no section subtitles and no menu. The
-only navigation is the link back to the index in the top left corner, and the
-table of contents under the abstract.
+Every entry page is one column of a single width, set once as `--column` in
+`:root`. `<body class="flow">` is what applies it, and it governs everything
+on the page, the bar at the top, the title, the abstract, the text, the
+equations, the figures and the footer. No element sets a width of its own, and
+an equation too wide for the column scrolls inside its own box rather than
+widening the page. There are no section numbers, no section subtitles and no
+menu. The only navigation is the link back to the index in the top left
+corner, and the table of contents under the abstract.
 
 | construction | markup |
 | --- | --- |

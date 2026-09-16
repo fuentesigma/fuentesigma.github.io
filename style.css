@@ -18,6 +18,7 @@
 
   --rail: 11rem;
   --measure: 42rem;
+  --column:  46rem;   /* the single column an entry page lives in */
   --gap: clamp(1rem, 3vw, 2.5rem);
 }
 
@@ -245,13 +246,33 @@ footer .row { row-gap: 0.5rem; }
    The .row and .body wrappers are kept so that everything hanging off
    .body (paragraph measure, figures, tables) keeps its widths. */
 
-main.flow { max-width: calc(var(--measure) + 14rem); }
-main.flow .row { display: block; }
-main.flow .row > .body,
-main.flow .row.wide > .body { max-width: 100%; }
-main.flow h2 { margin-bottom: 1.3rem; }
-main.flow .hero .year { margin: 0 0 1.4rem; font: 500 11px/1.6 var(--mono);
-                        letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+/* Everything on an entry page sits in one column of the same width, from
+   the bar at the top through the title, text, equations and figures to the
+   footer. No element sets a width of its own. */
+
+.flow main { max-width: var(--column); }
+.flow .row { display: block; }
+.flow .row > .body,
+.flow .row.wide > .body { max-width: 100%; }
+
+.flow .hero .lede,
+.flow .body > p,
+.flow .body > ul,
+.flow .body > ol,
+.flow .body > figure { max-width: 100%; }
+
+.flow h2 { margin-bottom: 1.3rem; }
+.flow .hero .year { margin: 0 0 1.4rem; font: 500 11px/1.6 var(--mono);
+                    letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+
+/* The bar keeps its full-bleed rule while its contents line up with the
+   column, and the footer does the same. */
+.flow .bar > * { width: 100%; max-width: var(--column); margin-inline: auto; }
+.flow footer .row { max-width: var(--column); margin-inline: auto; }
+
+/* Display maths a shade smaller so the long ones fit the column. Anything
+   still too wide scrolls inside .eq rather than widening the page. */
+.flow .eq .katex-display { font-size: 0.95em; }
 
 /* ---------- landing page ---------- */
 
