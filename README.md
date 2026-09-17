@@ -9,7 +9,7 @@ template/           skeleton for a new entry, not linked from anywhere
 psidm/              Schrodinger-Poisson solver for wave dark matter
 stokes/             non-abelian Stokes law for permutation-valued connections
 lion/               quantum machine learning with canonical variables
-frames/             reference frames, and what they do to an observable
+frames/             on frames of reference
 ```
 
 ## Adding an entry
