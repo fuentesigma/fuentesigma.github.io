@@ -10,6 +10,7 @@ psidm/              Schrodinger-Poisson solver for wave dark matter
 stokes/             non-abelian Stokes law for permutation-valued connections
 lion/               quantum machine learning with canonical variables
 frames/             on frames of reference
+build.py            turns an entry written in Markdown into its page
 ```
 
 ## Adding an entry
@@ -67,6 +68,62 @@ and removes the link.
 
 There is one accent colour for the whole site, set once as `--accent` in
 `:root`. Entry pages do not recolour themselves.
+
+## Writing an entry in Markdown
+
+An entry may be written either way. A directory holding an `index.html` and
+nothing else is hand-written and is never touched by anything. A directory
+holding an `index.md` has its `index.html` generated from it, and the file is
+committed alongside the source so that Pages keeps serving files exactly as
+they are.
+
+```sh
+mkdir <slug> && $EDITOR <slug>/index.md
+python3 build.py <slug>        # or let the Action do it on push
+```
+
+The front matter carries what the page needs outside the prose.
+
+```
+---
+title: On frames of reference
+year: 2024 - 2025
+description: one or two sentences, for search results and link previews
+summary: the shorter blurb the landing page carries, which is not the lede
+updated: 17th of September 2026
+---
+```
+
+`summary` is separate from the lede on purpose. The landing page is curated
+and its blurbs are shorter than the openings of the entries they point at.
+An entry without a `summary` is built but is not listed, and the landing
+blocks of hand-written entries are copied through untouched.
+
+The text before the first `##` becomes the lede. Every `##` becomes a section
+and the table of contents is assembled from them, with the anchor taken from
+the heading or written as `## Title {#anchor}`.
+
+| construction | markup |
+| --- | --- |
+| section | `## Title`, or `## Title {#anchor}` |
+| numbered equation | `$$ ... $$`, numbered in order of appearance |
+| labelled equation | `$$ ... $$ {#eq:name}` |
+| unnumbered equation | `$$ ... $$ {-}` |
+| reference to one | `@eq:name`, which resolves to its number |
+| inline mathematics | `$ ... $` |
+| aside | `> a blockquote` |
+| code excerpt | a fence carrying `file="path" role="what it is"` |
+| figure | `![caption](figures/x.svg){width="560" height="280" alt="..."}` |
+| table | an ordinary pipe table |
+| references | a numbered list under a `## References` heading |
+
+Equation numbers are assigned at build time, so inserting an equation
+renumbers the ones after it and every `@eq:` reference follows. This is the
+one thing the hand-written pages have to keep in order themselves.
+
+`python3 build.py --check` builds nothing and exits non-zero if any page is
+out of date with its source.
+
 
 ## Figures
 

@@ -1,0 +1,33 @@
+name: Build entries
+
+# Converts every <slug>/index.md into <slug>/index.html and refreshes the
+# landing blocks of the entries that have one. Entries written directly in
+# HTML are never touched.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: python3 build.py
+
+      - name: Commit the generated pages
+        run: |
+          # The commits are authored as the site owner on purpose. A commit
+          # authored by github-actions[bot] would put that bot in the
+          # repository's contributor list, which is not wanted here.
+          git config user.name  "Jesús Fuentes Aguilar"
+          git config user.email "24711119+fuentesigma@users.noreply.github.com"
+          git add -A
+          git diff --staged --quiet && echo "nothing to rebuild" && exit 0
+          git commit -m "Rebuild the entries generated from Markdown"
+          git push
