@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>On frames of reference</title>
+<meta name="description" content="How the choice of reference frame enters physical observables: gravity as a pseudo-force in a Lagrangian, the frame dependence of entropy in a canonical ensemble, the Airy ladder of a falling electron, and why a gauge transformation is not a change of frame.">
+<meta name="author" content="J. Fuentes Aguilar">
+<meta property="og:title" content="On frames of reference">
+<meta property="og:description" content="Gravity as a pseudo-force, entropy and energy spectra as frame-dependent observables, and the geometric distinction between a gauge transformation and a shift of frame.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://fuentesigma.github.io/frames/">
+<link rel="canonical" href="https://fuentesigma.github.io/frames/">
+<meta name="twitter:card" content="summary">
+
+<link rel="stylesheet" href="../style.css">
+
+<!-- KaTeX: math rendering, no build step. Pinned version. -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    renderMathInElement(document.body, {
+      delimiters: [
+        { left: "\\[", right: "\\]", display: true },
+        { left: "\\(", right: "\\)", display: false }
+      ],
+      macros: {
+        "\\dd": "\\mathrm{d}",
+        "\\ii": "\\mathrm{i}",
+        "\\Ai": "\\operatorname{Ai}",
+        "\\Bi": "\\operatorname{Bi}",
+        "\\kB": "k_{\\mathrm{B}}",
+        "\\avg": "\\langle #1 \\rangle"
+      },
+      ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code"],
+      throwOnError: false
+    });
+  });
+</script>
+</head>
+<body class="flow">
+
+<header class="bar">
+  <a class="home" href="../"><span class="dot"></span>J. Fuentes Aguilar<span class="sep">/</span>notes</a>
+</header>
+
+<main id="top">
+
+<!-- ================================================================ HERO -->
+<div class="hero">
+  <div class="row wide">
+    <div class="body">
+      <h1>On frames of reference</h1>
+      <div class="year">2024 &ndash; 2025</div>
+      <p class="lede">An essay for undergraduates on what the choice of frame does to a physical observable. A shift to a uniformly accelerated frame produces a gravitational potential out of nothing, and with it an entropy, an average height and a discrete energy spectrum that the inertial observer never sees. The same potential can be manufactured by a gauge transformation of the free Lagrangian, which invites the conclusion that the two operations are the same. They are not: one changes the local trivialisation of a principal bundle, the other changes the chart on the base.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================ TOC -->
+<section style="padding-top:2.2rem">
+  <div class="row wide">
+    <div class="body">
+      <ol class="toc">
+        <li><a href="#gravity"><span class="n">01</span><span class="t">Gravity is not a force</span></a></li>
+        <li><a href="#entropy"><span class="n">02</span><span class="t">Entropy is frame-dependent</span></a></li>
+        <li><a href="#spectra"><span class="n">03</span><span class="t">Energy spectra are frame-dependent</span></a></li>
+        <li><a href="#gauge"><span class="n">04</span><span class="t">Gauge, or a shift of frame?</span></a></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ 01 GRAVITY -->
+<section id="gravity">
+  <div class="row">
+    <div class="body">
+      <h2>Gravity is not a force</h2>
+
+      <p>Let \(m\) be the mass of a free-falling classical object and \(\mathbf{x}\) its position with respect to an inertial frame. The object is uncharged, no external forces act on it, and its internal degrees of freedom, if any, are irrelevant to its motion. Its Lagrangian is the kinetic term alone.</p>
+      <div class="eq"><span class="tag">eq. 1</span>
+        \[ \mathcal{L} = \tfrac{1}{2}\,m\,\dot{\mathbf{x}}^{2}. \]
+      </div>
+
+      <p>Shift now to a frame accelerating upward at constant \(\mathbf{g}\). The particle is described there by \(\mathbf{x}' = \mathbf{x} - \tfrac{1}{2}\mathbf{g}t^{2}\). Differentiating and substituting into eq. 1 gives the Lagrangian in the new frame, once the total time derivative \(\dd(m\,\mathbf{x}'\!\cdot\mathbf{g}\,t)/\dd t\) is discarded, which the principle of least action permits.</p>
+      <div class="eq"><span class="tag">eq. 2</span>
+        \[ \mathcal{L}' = \tfrac{1}{2}\,m\,\dot{\mathbf{x}}'^{\,2} - m\,\mathbf{g}\cdot\mathbf{x}'. \]
+      </div>
+
+      <p>The extra term is a potential produced by nothing but a change of frame. The Euler&ndash;Lagrange equations return the effective force \(-\nabla(-m\,\mathbf{g}\cdot\mathbf{x}') = m\mathbf{g}\), read in the accelerated frame as the gravitational force, though it owes its presence to no interaction. Gravity appears here as a pseudo-force, which sits awkwardly beside Newton's law of universal gravitation and its product of two masses. The notion of escape velocity is the shortest route to the bottom of the matter.</p>
+
+      <p>Escape velocity is the least speed a massive particle must reach to leave a gravitational field without further propulsion. For a spherically symmetric mass \(M\) of radius \(r\), energy conservation at the surface gives it directly.</p>
+      <div class="eq"><span class="tag">eq. 3</span>
+        \[ \tfrac{1}{2}\,m\,v_{\text{esc}}^{2} = \frac{GMm}{r}
+           \qquad\Longrightarrow\qquad
+           v_{\text{esc}} = \sqrt{\frac{2GM}{r}}\,, \]
+      </div>
+      <p>with \(G\) the gravitational constant. In a free-falling frame the particle follows a geodesic and feels no gravitational force, so escape velocity has no meaning there. In a stationary frame gravity enters as the potential of eq. 2, behaves force-wise, and the quantity survives. Newton's law quantified the effect without ever saying how two masses communicate their pull. Einstein's answer was that gravity is the curvature of spacetime, and that this geometry is proportional to matter and energy.</p>
+
+      <p>Among the simplest exact solutions of the field equations is Schwarzschild's, obtained by imposing spherical symmetry [1].</p>
+      <div class="eq"><span class="tag">eq. 4</span>
+        \[ \dd s^{2} = -\left(1 - \frac{2GM}{rc^{2}}\right)c^{2}\dd t^{2}
+           + \left(1 - \frac{2GM}{rc^{2}}\right)^{-1}\dd r^{2}
+           + r^{2}\,\dd\Omega^{2}. \]
+      </div>
+
+      <p>Here \(\dd\Omega^{2}\) is the metric on the 2-sphere and carries the \(SO(3)\) rotational symmetry of the problem. Each 2-sphere at fixed \(r\) closes smoothly, which is the statement that all directions about the central mass are equivalent, and the full isometry group of the Schwarzschild exterior includes a time translation alongside these rotations, forming \(SO(3)\times\mathbb{R}\).</p>
+
+      <p>At \(r = r_{s} = 2GM/c^{2}\) the temporal factor vanishes while the radial term diverges. This is a coordinate singularity, the Schwarzschild radius, and it marks the horizon of a black hole. Beyond it the radial coordinate fails to remain spacelike and light cannot escape, the escape velocity of eq. 3 having reached \(c\). Every trajectory, including an outward-oriented geodesic, curves back. The notion that was so practical in Newtonian contexts has become a statement about causal structure: not whether a force can be overpowered, but whether any causal path to infinity exists at all.</p>
+
+      <p>The two pictures reconcile as follows. Gravity is a pseudo-force in the non-inertial frame of eq. 2, and yet the escape velocity it yields is a real threshold, because the geometry encodes a genuine condition on the energy needed to leave the mass distribution. The threshold does not hinge on an interaction. It hinges on whether a geodesic extends to infinity. An apparent pseudo-force in one frame is a very real energy budget in another.</p>
+
+      <p>Photons admit no inertial frame at all. Inertial coordinates require massive observers, whose world-lines satisfy \(\dd s^{2} &lt; 0\), whereas for light \(\dd s^{2} = 0\) and the trajectory is null rather than timelike. In flat spacetime with \(\dd s^{2} = -c^{2}\dd t^{2} + \dd\mathbf{x}^{2}\), the light cone enforces \(|\dd\mathbf{x}| = \pm c\,\dd t\). There is no rest frame in which a photon sees itself outside time, and the familiar claim that photons travel instantaneously from their own viewpoint is without content, since a coordinate system co-moving with light is inconsistent with the requirement \(\dd s^{2} &lt; 0\). From our frame photons take time to cross space; from theirs, travelling is not defined.</p>
+
+      <div class="note">
+        <p>The same holds in curved spacetime. A photon follows a null geodesic whatever the coordinates, and the apparent force of gravity comes from the geometry rather than from a frame-dependent potential. At the horizon light still moves locally at \(c\) along null geodesics, and no rest frame attaches to it there or anywhere else. Frames of reference are a timelike privilege.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ 02 ENTROPY -->
+<section id="entropy">
+  <div class="row">
+    <div class="body">
+      <h2>Entropy is frame-dependent</h2>
+
+      <p>The distinction does not stop at forces. Entropy and energy are observables, and both depend on the frame. Legendre transforming eq. 1 and eq. 2 gives a pair of Hamiltonians, with \(\mathbf{p}\) the canonical momentum in each frame.</p>
+      <div class="eq"><span class="tag">eq. 5</span>
+        \[ H = \frac{\mathbf{p}^{2}}{2m},
+           \qquad\qquad
+           H' = \frac{\mathbf{p}'^{\,2}}{2m} + m\,\mathbf{g}\cdot\mathbf{x}'. \]
+      </div>
+
+      <p>Neither carries explicit time dependence, so each is the energy of the particle in its own frame. In the inertial frame the phase-space volume depends on momentum alone.</p>
+      <div class="eq"><span class="tag">eq. 6</span>
+        \[ \Omega \;\propto\; \int \dd\mathbf{p}\,\dd\mathbf{x}\;
+           \delta\!\left(\frac{\mathbf{p}^{2}}{2m} - E\right), \]
+      </div>
+      <p>and the microcanonical entropy \(S = \kB\ln\Omega\) depends only on the total energy \(E\), which is purely kinetic in the inertial frame and kinetic plus potential in the non-inertial one.</p>
+
+      <p>Take instead a canonical ensemble, energy exchanged with a bath at fixed temperature \(T\), with \(\beta = 1/\kB T\). The spatial integral returns the volume \(V\) and the momentum integral is Gaussian.</p>
+      <div class="eq"><span class="tag">eq. 7</span>
+        \[ Z = \int_{\mathbb{R}} \dd\mathbf{p}\,\dd\mathbf{x}\;e^{-\beta H}
+             = C\,V\left(\frac{2\pi m}{\beta}\right)^{3/2}, \]
+      </div>
+      <p>with \(C\) a normalisation constant. The canonical entropy is \(\kB(\ln Z + \beta E)\) with average energy \(E = 3\kB T/2\), so that</p>
+      <div class="eq"><span class="tag">eq. 8</span>
+        \[ S = \kB\left[\ln C + \ln V + \tfrac{3}{2}\left(1 + \ln 2\pi m \kB T\right)\right]. \]
+      </div>
+
+      <p>Seen from the non-inertial frame the particle falls along the unit normal to the surface of that frame. Take the motion along \(Oz'\), with no loss of generality since no other force is present and any precession may be disregarded.</p>
+      <div class="eq"><span class="tag">eq. 9</span>
+        \[ Z' = \int_{\mathbb{R}} \dd\mathbf{p}'\,\dd\mathbf{x}'\;
+           \exp\!\left[-\beta\left(\frac{p'^{\,2}}{2m} + mgz'\right)\right]
+           = C'\,\frac{A_{\perp}}{\beta m g}\left(\frac{2\pi m}{\beta}\right)^{3/2}. \]
+      </div>
+      <p>The momentum sum is the one already done. For significant height differences the integral along the axis of motion sets the average height \(\avg{z} = 1/\beta m g\), while the transverse integral gives the area \(A_{\perp}\) perpendicular to \(\mathbf{g}\). The average energy now carries the potential term of eq. 5, \(E' = 3\kB T/2 + mg\avg{z}\), and the entropy follows.</p>
+      <div class="eq"><span class="tag">eq. 10</span>
+        \[ S' = \kB\left[\ln C' + \ln A_{\perp} + \tfrac{3}{2}\ln 2\pi m \kB T
+           - \ln\!\left(\frac{mg}{\kB T}\right) + \tfrac{5}{2}\right]. \]
+      </div>
+
+      <p>The volume integral has acquired a dependence on temperature, not merely because the ensemble exchanges energy with a bath, but because the gravitational potential has changed how many microstates are accessible. \(T\) is not coupled to any microscopic interaction here. It is the temperature at which thermal fluctuations statistically balance the gravitational potential energy, which is why \(\avg{z}\) depends on it.</p>
+
+      <p>Subtracting eq. 8 from eq. 10 leaves a difference fixed, up to the normalisations, by the volumes of motion available in each frame.</p>
+      <div class="eq"><span class="tag">eq. 11</span>
+        \[ \Delta S \;\propto\; \ln\!\left(\frac{\kB T A_{\perp}}{mg}\right) - \ln V + 1 . \]
+      </div>
+
+      <p>Why should the energy differ between the frames? There is no free lunch: it is not the same thing that moves. In the inertial frame the relevant quantity is the kinetic energy of the falling object; in the non-inertial frame it is that kinetic energy together with the energy of the accelerated observer. Energy is conserved in both, the first law holds in both, and the value in one frame is recovered from the other by the appropriate transformation.</p>
+
+      <p>Carrying this into general relativity means recognising that gravity is curvature, not a potential. A uniform field can be mimicked by an accelerating observer in flat spacetime, but real astrophysical objects impose the curved geometry of solutions like eq. 4, and no global inertial frame covers such a spacetime, least of all near a horizon. Local observers in free fall still recover Minkowski geometry in their immediate neighbourhood. Entropy must then be revisited, because constructing anything like a global partition function requires a timelike Killing vector for the whole spacetime, and for Schwarzschild that vector exists only outside the horizon. The comparison with an accelerated observer is correspondingly subtler than in flat space.</p>
+
+      <p>The interplay surfaces most sharply in black hole thermodynamics. The horizon of a Schwarzschild black hole of mass \(M\) behaves as a thermal surface at the Hawking temperature, and Bekenstein and Hawking assigned it an entropy proportional to its area [2, 3].</p>
+      <div class="eq"><span class="tag">eq. 12</span>
+        \[ T_{\mathrm{H}} = \frac{\hbar c^{3}}{8\pi G M \kB},
+           \qquad\qquad
+           S_{\mathrm{BH}} = \kB\,\frac{A}{4\,\ell_{\mathrm{p}}^{2}},
+           \qquad \ell_{\mathrm{p}}^{2} = \frac{\hbar G}{c^{3}} . \]
+      </div>
+
+      <p>Energy and entropy are horizon-sensitive and cannot be treated as purely local constructs. Just as the free-falling observer in flat space sees no gravitational potential, an observer dropping into a black hole feels no force at the horizon, while an observer hovering at fixed radius perceives an effect that shapes the very definitions of temperature and entropy. Different frames, and in curved spacetime especially, alter how energy, partition functions and thermodynamic behaviour are formulated at all. Horizons are the most dramatic case of frames and geometry intertwined.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ 03 SPECTRA -->
+<section id="spectra">
+  <div class="row">
+    <div class="body">
+      <h2>Energy spectra are frame-dependent</h2>
+
+      <p>Extend the analysis to a free electron. Symmetrising the inertial Hamiltonian of eq. 5 gives \(\hat H = \hat{\mathbf{p}}^{2}/2m_{e}\), with \(m_{e}\) the electron mass. The electron moves freely, gravity is absent, and the Schr&ouml;dinger equation is a time-independent eigenvalue problem.</p>
+      <div class="eq"><span class="tag">eq. 13</span>
+        \[ \hat H\,\psi = E\,\psi . \]
+      </div>
+      <p>Sturm&ndash;Liouville theory returns plane waves \(\psi(\mathbf{x}) = e^{\ii\mathbf{k}\cdot\mathbf{x}}\), not square integrable, and the spectrum is the continuum \(E = \hbar^{2}k^{2}/2m_{e}\). That is the whole solution.</p>
+
+      <p>Symmetrising the non-inertial Hamiltonian instead gives an operator in which \(\mathbf{g}\) remains classical.</p>
+      <div class="eq"><span class="tag">eq. 14</span>
+        \[ \hat H' = \frac{\hat{\mathbf{p}}'^{\,2}}{2m_{e}} + m_{e}\,\mathbf{g}\cdot\hat{\mathbf{x}}' . \]
+      </div>
+
+      <p>Let the electron fall radially toward the body whose mass curves the geometry. Substituting the momentum operator and using \(\hat z\,\psi = z\,\psi\), eq. 13 becomes the Schr&ouml;dinger equation for a linear potential.</p>
+      <div class="eq"><span class="tag">eq. 15</span>
+        \[ -\frac{\hbar^{2}}{2m_{e}}\frac{\dd^{2}\psi}{\dd z^{2}}
+           + \left(m_{e}\,g\,z - E\right)\psi = 0 . \]
+      </div>
+
+      <p>This is the Airy equation, whose general solution combines \(\Ai\) and \(\Bi\). Since \(\Bi\) diverges as \(z\to\infty\), the physically acceptable solution keeps the first kind alone.</p>
+      <div class="eq"><span class="tag">eq. 16</span>
+        \[ \psi(z) = C_{1}\,\Ai\!\left[\frac{z - E/m_{e}g}{\left(\hbar^{2}/2m_{e}^{2}g\right)^{1/3}}\right]. \]
+      </div>
+
+      <p>Quantisation comes from the boundary condition. Requiring the wavefunction to vanish at the floor of the potential ties the admissible energies to the zeros \(a_{n}\) of the Airy function, which are negative and unbounded below.</p>
+      <div class="eq"><span class="tag">eq. 17</span>
+        \[ E_{n} = \left(\frac{m_{e}\,g^{2}\hbar^{2}}{2}\right)^{1/3}\,|a_{n}| ,
+           \qquad \Ai(a_{n}) = 0 . \]
+      </div>
+
+      <p>The spectrum is discrete when the electron is seen falling from a non-inertial frame, and the wavefunctions are now square integrable, decaying beneath the classical turning point. The accelerated observer has introduced a ladder whose spacing is set by the gravitational energy scale, which generalises the classical thermal discussion of the previous section. The same ladder has been measured, for ultracold neutrons bouncing above a mirror in the field of the Earth [4], and gravitationally induced phase shifts of the corresponding kind were seen by neutron interferometry much earlier [5].</p>
+
+      <p>Step up to quantum field theory in curved spacetime. In flat space the Dirac equation governs relativistic spin-\(\tfrac{1}{2}\) particles,</p>
+      <div class="eq"><span class="tag">eq. 18</span>
+        \[ \left(\ii\gamma^{\mu}\partial_{\mu} - m_{e}\right)\psi = 0 ,
+           \qquad \{\gamma^{\mu},\gamma^{\nu}\} = 2\eta^{\mu\nu} , \]
+      </div>
+      <p>with \(\psi\) the Dirac spinor and \(\eta^{\mu\nu}\) the Minkowski metric. The free Dirac Hamiltonian is \(\hat H_{0} = c\,\alpha\cdot\hat{\mathbf{p}} + m_{e}c^{2}\beta\), and eq. 13 returns the usual dispersion relation \(E = \pm\sqrt{p^{2}c^{2} + m_{e}^{2}c^{4}}\), continuous throughout, with positive-energy solutions for electrons and negative-energy ones for positrons. No discrete eigenvalues appear, since a free electron may occupy any momentum state. At instantaneous rest and in the positive-energy branch this reduces to \(E = m_{e}c^{2}\).</p>
+
+      <div class="note">
+        <p>The electron was in free fall, so what is meant by rest? An instantaneous rest frame, momentarily co-moving with the electron. Locally, over an infinitesimal interval, that frame sees the momentum vanish and the energy equal \(m_{e}c^{2}\); globally the electron keeps moving with respect to any fixed laboratory frame, where \(p \neq 0\). There is no contradiction. One statement is the dispersion relation in flat spacetime with no external field, the other is its limiting case \(p = 0\).</p>
+      </div>
+
+      <p>In a non-inertial frame, equivalently for an observer accelerating at \(g\) in flat spacetime, the effective potential is added to the free Hamiltonian.</p>
+      <div class="eq"><span class="tag">eq. 19</span>
+        \[ \hat H' = c\,\alpha\cdot\hat{\mathbf{p}} + m_{e}c^{2}\beta + m_{e}\,g\,\hat z . \]
+      </div>
+      <p>The form is strictly valid only for weak fields or locally uniform acceleration, but it shows how the spectrum becomes discrete once boundary conditions are imposed, exactly as in eq. 14. Confining the electron so that \(\psi(z)\to 0\) at large negative \(z\) forces the spinor to satisfy a relativistic Airy-type equation, and the interplay of the linear potential with that condition produces a ladder of levels \(E_{n}\) set by \(m_{e}\), \(g\) and \(\hbar c\), more involved than eq. 17 because of the spinor structure but discrete for the same reason: normalisability against a linearly growing potential.</p>
+
+      <p>For curved spacetime proper, rather than a merely accelerating observer, the term \(m_{e}gz\) must be replaced by the full gravitational coupling of the covariant Dirac equation [6].</p>
+      <div class="eq"><span class="tag">eq. 20</span>
+        \[ \left(\ii\gamma^{\mu}D_{\mu} - m_{e}\right)\psi = 0 ,
+           \qquad D_{\mu} = \partial_{\mu} + \Gamma_{\mu} ,
+           \qquad \Gamma_{\mu} = \tfrac{1}{8}\,[\gamma^{a},\gamma^{b}]\,\omega_{\mu ab} , \]
+      </div>
+      <p>where \(\Gamma_{\mu}\) is the spin connection and \(\omega_{\mu ab}\) the spin coefficients that couple the spinor field to the curvature.</p>
+
+      <p>Under strong curvature there is no global inertial frame and gravity cannot be captured by a single \(m_{e}gz\). Finding energy levels becomes the global problem of solving eq. 20 in the appropriate metric. Locally a free-falling observer still recovers \(\hat H_{0}\) in a small neighbourhood, by the equivalence principle, while an observer hovering at fixed \(r\) sees a redshifted spectrum and an effective potential that diverges at the horizon. This is not a failure but the precise content of the principle: an observer in free fall cannot distinguish rest in flat spacetime from radial fall in Schwarzschild geometry, in a neighbourhood small enough for tidal effects to be irrelevant.</p>
+
+      <p>The energy attributed to a quantum state therefore depends on whether the observer falls, hovers or accelerates. Inertial frames see free propagation and locally continuous energies; non-inertial or stationary frames in curved spacetime see additional structure, discretisation or redshift, according to the boundary conditions imposed and the severity of the geometry. Even in the relativistic domain, the notion of an energy spectrum is frame-dependent. The logic of the linear-potential model survives the passage: the equivalence principle equates uniform acceleration with a homogeneous field locally, which is why \(mgz\) can be recast as a coordinate effect on a small enough patch, and the same principle guarantees that free fall near a black hole recovers the Minkowski vacuum locally, while the observer who holds position must spend energy to do so and measures a spectrum modified accordingly.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ 04 GAUGE -->
+<section id="gauge">
+  <div class="row">
+    <div class="body">
+      <h2>Gauge, or a shift of frame?</h2>
+
+      <p>Gauge fields, abelian or not, also respond to a change of frame, in ways governed by local gauge invariance, which keeps observables independent of the choice of potentials. The question is whether a gauge transformation of eq. 1 can reintroduce the potential of eq. 2 in another gauge.</p>
+
+      <p>In Lagrangian mechanics a gauge transformation adds the total time derivative of an arbitrary smooth function \(\chi(\mathbf{x},t)\), leaving the equations of motion untouched.</p>
+      <div class="eq"><span class="tag">eq. 21</span>
+        \[ \mathcal{L} \;\longrightarrow\; \mathcal{L}' = \mathcal{L} + \frac{\dd\chi}{\dd t}. \]
+      </div>
+
+      <p>Choose the gauge function to be the action of a particle of mass \(m\) held at rest in a gravitational field.</p>
+      <div class="eq"><span class="tag">eq. 22</span>
+        \[ \chi = -\,m\int \dd t\;\mathbf{g}\cdot\mathbf{x}' . \]
+      </div>
+
+      <p>Its total time derivative, substituted together with eq. 1 into eq. 21, returns \(\mathcal{L}' = \tfrac{1}{2}m\dot{\mathbf{x}}'^{\,2} - m\,\mathbf{g}\cdot\mathbf{x}'\), which is eq. 2. Gravity has reappeared as an effective potential though it was absent from the free-fall frame. This is no coincidence: a linear gravitational potential can always be reintroduced by a suitable gauge transformation.</p>
+
+      <p>In non-relativistic quantum mechanics such transformations preserve probabilities while altering the energy spectrum and the partition function, with consequences for any system that responds to those quantities, as eq. 17 already showed. The path integral makes the mechanism explicit through the propagator, which carries the transition amplitude between two states. For a free particle over \([t_{i},t_{f}]\) the kernel is Gaussian.</p>
+      <div class="eq"><span class="tag">eq. 23</span>
+        \[ K_{0}(\mathbf{x}_{f},t_{f};\mathbf{x}_{i},t_{i})
+           = \left(\frac{m}{2\pi\ii\hbar\,(t_{f}-t_{i})}\right)^{3/2}
+             \exp\!\left(\frac{\ii m\,|\mathbf{x}_{f}-\mathbf{x}_{i}|^{2}}{2\hbar\,(t_{f}-t_{i})}\right). \]
+      </div>
+
+      <p>Under eq. 21 the kernel picks up a phase at each endpoint, fixed by the gauge function of eq. 22.</p>
+      <div class="eq"><span class="tag">eq. 24</span>
+        \[ K' = e^{\,\ii\chi(\mathbf{x}_{f},t_{f})/\hbar}\;K_{0}\;e^{-\ii\chi(\mathbf{x}_{i},t_{i})/\hbar},
+           \qquad\qquad |K'| = |K_{0}| . \]
+      </div>
+
+      <p>The modulus is untouched because the factors are pure phases, so the probability of finding the particle at a given point at a given time is unchanged. That invariance is gauge symmetry in its plainest form: observables cannot depend on an arbitrary redefinition of the potentials.</p>
+
+      <p>It does not follow that nothing changes. The phase corresponds to an effective shift of the spectrum. The modified Lagrangian introduces a momentum shift, a quadratic offset and a linear potential, and the gauge transformation therefore amounts to a frame in which the particle perceives an effective momentum shift and an additional scalar potential. Transition probabilities are unaltered; eigenvalues and the structure of the levels are not. The interpretation of energy levels depends on the gauge, which acts as a choice of coordinate or frame in which the system is described, and the spectrum encodes that freedom.</p>
+
+      <p>The same holds in imaginary time, where the partition function is a propagator with periodic boundary conditions.</p>
+      <div class="eq"><span class="tag">eq. 25</span>
+        \[ Z = \int \mathcal{D}\mathbf{x}(\tau)\;
+           \exp\!\left(-\frac{1}{\hbar}\int_{0}^{\hbar\beta}\!\dd\tau\;
+           \mathcal{L}\!\left[\mathbf{x}(\tau),\dot{\mathbf{x}}(\tau)\right]\right). \]
+      </div>
+      <p>A gauge transformation shifts the effective potential in the exponent. The modulus of the propagator protects the transition probabilities; the levels entering \(Z\) and the free energy are not protected. Thermodynamic quantities encode the frame or gauge even where the probabilities do not. Concretely, the free-particle result of eq. 7 acquires the Boltzmann factor \(\exp(-\beta\,m\,\mathbf{g}\cdot\mathbf{x})\) of a uniform field, whose effect depends on the domain of integration and the boundary conditions, and which shows up as sedimentation equilibrium classically and as shifted levels quantum mechanically.</p>
+
+      <p>So the freedom to choose a gauge, or equivalently to select a frame, is visible in the thermodynamic sector through the spectrum while leaving absolute transition probabilities alone. This reconciles the gauge invariance of the dynamics with the gauge dependence of energy-based descriptions. But the coincidence should not be mistaken for an identity.</p>
+
+      <p>In the language of fibre bundles, a gauge transformation is a change of local trivialisation of a principal bundle whose fibres carry the internal degrees of freedom, phases in the abelian case and group elements more generally. Choosing a gauge is choosing a local section, and observables are invariant because they are built from the curvature and other gauge-covariant objects. Switching frames is a transformation in the tangent bundle and its associates, and it changes how gravitational and inertial effects are perceived at the level of spacetime itself. A change of frame redefines charts and coordinate patches on a manifold, altering how distances and times are measured; a gauge redefinition changes how internal charges are tracked along the fibres.</p>
+
+      <p>One can engineer a gauge transformation that produces a gravity-like potential, as eq. 22 does. The coincidence dissolves none of the geometric difference. Gauge bundles handle internal symmetries; frames of reference turn on the structure of spacetime and on how vectors are based in tangent spaces. The two constructions can yield identical terms in a Lagrangian while living on distinct bundles with distinct connections. Changing the gauge is not changing the frame, however alike the immediate manifestations appear.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ REFS -->
+<section id="refs">
+  <div class="row">
+    <div class="body">
+      <h2>References</h2>
+      <ol class="refs">
+        <li>K. Schwarzschild, <em>&Uuml;ber das Gravitationsfeld eines Massenpunktes nach der Einsteinschen Theorie</em>, Sitzungsber. Preuss. Akad. Wiss. Berlin, 189 (1916).</li>
+        <li>J. D. Bekenstein, <em>Black holes and entropy</em>, Phys. Rev. D 7, 2333 (1973).</li>
+        <li>S. W. Hawking, <em>Particle creation by black holes</em>, Commun. Math. Phys. 43, 199 (1975).</li>
+        <li>V. V. Nesvizhevsky <em>et al.</em>, <em>Quantum states of neutrons in the Earth's gravitational field</em>, Nature 415, 297 (2002).</li>
+        <li>R. Colella, A. W. Overhauser, S. A. Werner, <em>Observation of gravitationally induced quantum interference</em>, Phys. Rev. Lett. 34, 1472 (1975).</li>
+        <li>D. R. Brill, J. A. Wheeler, <em>Interaction of neutrinos and gravitational fields</em>, Rev. Mod. Phys. 29, 465 (1957).</li>
+        <li>W. G. Unruh, <em>Notes on black-hole evaporation</em>, Phys. Rev. D 14, 870 (1976).</li>
+        <li>C. W. Misner, K. S. Thorne, J. A. Wheeler, <em>Gravitation</em>, Freeman (1973).</li>
+        <li>N. D. Birrell, P. C. W. Davies, <em>Quantum Fields in Curved Space</em>, Cambridge University Press (1982).</li>
+        <li>L. D. Landau, E. M. Lifshitz, <em>Mechanics</em>, 3rd ed., Pergamon (1976).</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="row wide">
+    <div class="body">
+      Written by J. Fuentes Aguilar &ndash;&ndash; j.fuentesaquilar [at] gmail [dot] com <br>
+      Last updated 17th of September 2026
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
