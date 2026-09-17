@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>On Frames Of Reference</title>
-<meta name="description" content="An essay for undergraduate physics students on the role of reference frames in classical mechanics, general relativity and quantum mechanics, and their influence on energy, entropy and quantum spectra.">
+<meta name="description" content="On the role of reference frames in classical mechanics, general relativity and quantum mechanics, and their influence on energy, entropy and quantum spectra.">
 <meta name="author" content="J. Fuentes Aguilar">
 <meta property="og:title" content="On Frames Of Reference">
 <meta property="og:description" content="Reference frames in classical mechanics, general relativity and quantum mechanics, and their influence on energy, entropy and quantum spectra.">
@@ -45,8 +45,17 @@
   <div class="row wide">
     <div class="body">
       <h1>On Frames Of Reference</h1>
-      <div class="year">December 24, MMXXIV</div>
-      <p class="lede">This essay is crafted and dedicated to physics students, especially those in their undergraduate years. The role of reference frames in classical mechanics, general relativity, and quantum mechanics is examined, with emphasis on their influence on physical observables such as energy, entropy, and quantum spectra. Beginning within a classical Lagrangian formalism, gravitational potentials are shown to emerge as pseudo-forces in non-inertial frames, contrasting Newtonian interpretations with the geometric perspective of general relativity. Entropy's frame dependence is then analysed, revealing how gravitational potentials modify thermodynamic quantities in canonical ensembles. In the quantum mechanical context, the quantised energy spectrum of a free-falling electron in non-inertial frames is derived, outlining implications for spinor fields in curved spacetime via the Dirac equation. Finally, the interplay between gauge transformations and reference frame shifts is addressed, highlighting their distinct geometric origins despite occasionally producing analogous physical effects.</p>
+      <div class="year">December 2024</div>
+      <p class="lede">In this brief essay, I review the role of reference frames in physics, 
+        in particular, their influence on physical observables such as energy, entropy, and quantum spectra. 
+        Beginning within a classical Lagrangian formalism, I revisit how gravitational potentials emerge as pseudo-forces in non-inertial frames, 
+        differing from the Newtonian geometrisation. 
+        Entropy is another quantity that depends on the frame of reference, 
+        which immediately leads to observe how gravitational potentials modify local thermodynamic quantities. 
+        Going further, the quantised energy spectrum of a free-falling electron in non-inertial frames outlines implications 
+        for spinor fields in curved spacetime via the Dirac equation. 
+        As well, it is discussed how gauge transformations and reference frame shifts occasionally 
+        produce similar physical effects despite being geometrically different.</p>
     </div>
   </div>
 </div>
@@ -71,13 +80,19 @@
     <div class="body">
       <h2>Gravity Is Not A Force</h2>
 
-      <p>Let \(m\) be the mass of a free-falling classical object and \(\mathbf{x}\) its position vector wrt an inertial frame of reference. For now, let such an object be uncharged. Suppose there are no external forces acting on the particle, and its internal degrees of freedom, if any, are irrelevant to its motion. The Lagrangian for this particle is given by:</p>
+      <p>Let \(m\) be the mass of a free-falling classical object and \(\mathbf{x}\) its position vector wrt. an inertial frame of reference. 
+        Suppose there are no external forces acting on the particle, and its internal degrees of freedom as well as its charge, if any, are irrelevant to its motion. 
+        The Lagrangian for this particle is given by:</p>
 
       <div class="eq"><span class="tag">eq. 1</span>
         \[ \mathcal{L} = \frac{1}{2}m\dot{\mathbf{x}}^2. \]
       </div>
 
-      <p>One can shift to a non-inertial frame of reference accelerating upward at constant acceleration \(\mathbf{g}\). In this new coordinate system, the particle is described by the position vector \(\mathbf{x}' = \mathbf{x} - \frac{1}{2}\mathbf{g}t^2\), where \(t\) determines the time at which the particle has been displaced a length \(|\mathbf{x}_0|\) from the origin. An expression for the non-inertial Lagrangian is obtained by differentiating \(\mathbf{x}'\) wrt time and substituting it into eq.&nbsp;1, expressly:</p>
+      <p>One can shift to a non-inertial frame of reference accelerating upward at constant acceleration \(\mathbf{g}.\) 
+        In this new coordinate system, the particle is described by the position vector \(\mathbf{x}' = \mathbf{x} - \frac{1}{2}\mathbf{g}t^2,\) 
+        where \(t\) determines the time at which the particle has been displaced a length \(|\mathbf{x}_0|\) from the origin. 
+        An expression for the non-inertial Lagrangian is obtained by differentiating \(\mathbf{x}'\) wrt. time and substituting it 
+        into eq.&nbsp;1:</p>
 
       <div class="eq"><span class="tag">eq. 2</span>
         \[ \mathcal{L}' = \frac{1}{2}m\dot{\mathbf{x}}^{'2} - m \mathbf{g} \cdot \mathbf{x}', \]
@@ -85,9 +100,14 @@
 
       <p>where the term \(\mathrm{d}/\mathrm{d}t (m \mathbf{x}' \cdot \mathbf{g} t)\) has been neglected since a total time derivative finds no influence within the principle of least action.</p>
 
-      <p>The extra term \(- m \mathbf{g} \cdot \mathbf{x}'\) in eq.&nbsp;2 acts like a potential produced solely by a shift of reference frame. In consequence, from the Euler-Lagrange equations of motion the effective force \(-\nabla(-m \mathbf{g} \cdot \mathbf{x}' ) = m \mathbf{g}\) is interpreted as the gravitational force in the accelerated frame, although not owing its presence to any interaction. Gravity thereby appears as a pseudo-force being at odds with Newton’s derivation that posits a law of universal gravitation proportional to the product of two masses and inversely proportional to the square of their separation. To clarify matters, we shall survey the notion of escape velocity, which can help in seeing the bottom.</p>
+      <p>The extra term \(- m \mathbf{g} \cdot \mathbf{x}'\) in eq.&nbsp;2 acts like a potential produced solely by a shift of reference frame. 
+        In consequence, from the Euler-Lagrange equations of motion the effective force \(-\nabla(-m \mathbf{g} \cdot \mathbf{x}' ) = m \mathbf{g}\) 
+        is interpreted as the gravitational force in the accelerated frame, although not owing its presence to any interaction. 
+        Gravity, thereby, appears as a pseudo-force being at odds with Newton’s derivation, in that the latter posits a law of universal gravitation proportional 
+        to the product of two masses and inversely proportional to the square of their separation. Which one is correct?</p>
 
-      <p>The escape velocity is the minimum speed a massive particle must attain to break free from a gravitational field without any further propulsion. For a spherically symmetric mass \(M\) with radius \(r\), the escape velocity for a particle of mass \(m\) over such a body's surface is derived from energy conservation as:</p>
+      <p>I shall put things this way. The escape velocity is the minimum speed a massive particle must attain to break free from a gravitational field without any further propulsion. 
+        For a spherically symmetric mass \(M\) with radius \(r\), the escape velocity for a particle of mass \(m\) over such a body's surface is derived from energy conservation as:</p>
 
       <div class="eq"><span class="tag">eq. 3</span>
         \[ \frac{1}{2}mv_\text{esc}^2 = \frac{GMm}{r} \qquad \implies \qquad v_\text{esc} = \sqrt{\frac{2GM}{r}}, \]
