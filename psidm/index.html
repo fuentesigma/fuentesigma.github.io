@@ -54,7 +54,11 @@
     <div class="body">
       <h1>Evolving the dark universe as a single wave (<span class="psi">ψ</span>DM)</h1>
       <div class="year">2014 &ndash; 2026</div>
-      <p class="lede">A solver for the Schrödinger–Poisson equations in an expanding universe to model large-scale structure formation. The code starts from the matter power spectrum at redshift 1000 and follows the dark matter wavefunction as it collapses into halos with solitonic cores. It combines a pseudo-spectral method on the root grid with finite differences on adaptively refined patches, and it runs on GPUs and across MPI ranks. The project began as my master's thesis at CINVESTAV-IPN, Mexico, in 2014. The code has since been rebuilt and systematically tested.</p>
+      <p class="lede">A solver for the Schrödinger–Poisson equations in an expanding universe to model large-scale structure formation. 
+        The simulation starts from the matter power spectrum at redshift 1000 and follows the dark matter wavefunction as it collapses into halos with solitonic cores. 
+        It combines a pseudo-spectral method on the root grid with finite differences on adaptively refined patches, 
+        and it runs on GPUs and across MPI ranks. 
+        The project began as my master's thesis at CINVESTAV-IPN, Mexico, in 2014. The code has since been rebuilt and systematically tested.</p>
     </div>
   </div>
 </div>
@@ -262,7 +266,7 @@ denom = 1.0 + 6.0 * alpha
 
       <p>The command <code>python run.py preflight</code> prints all settings and the derived quantities before a run starts. These include the simulation units, cell size, Nyquist wavenumber, a lower bound on the number of steps, the memory required and the list of known open issues. The test bench groups its tests into eight independent layers, from FFT primitives to halo catalogues, and an error can be traced to the layer in which it originates.</p>
 
-      <h3>Cosmology and code</h3>
+      <h3>Cosmology and Simulation</h3>
       <p>All physical input is defined in three dataclasses in <code>run.py</code>, and the solver derives every quantity in simulation units from them. The table below follows each cosmological parameter from its definition to the function in which it acts.</p>
       <div class="file"><span>run.py</span><span>cosmology and box</span></div>
 <pre><code>@dataclass
@@ -302,7 +306,7 @@ denom = 1.0 + 6.0 * alpha
 
   <div class="row">
     <div class="body">
-      <p>The boson mass, the Hubble constant and the matter density enter the simulation through <code>physical_units</code> in <code>engine/cosmology.py</code>, which returns the units \(L_0\) and \(T_0\). The class <code>MPISchrodingerPoisson</code> in <code>engine/simulation.py</code> converts the box size to code units, evaluates the expansion rate with \(\Omega_{\Lambda 0}\) in its method <code>da_dtau</code> and advances the scale factor in <code>advance_a</code>. The initial redshift fixes the starting scale factor of the root level in <code>engine/parallel/level.py</code>. The power spectrum is sampled in <code>wavefunction_ic</code> in <code>engine/grids.py</code> and in its distributed counterpart <code>MPILevel._generate_ic</code>, and the growth rate that sets the phase of \(\psi\) is computed in <code>velocities_cosmo</code> in <code>engine/cosmology.py</code>. The virial overdensity is defined in the class <code>Units</code> in <code>engine/halos.py</code>.</p>
+      <p>The boson mass, the Hubble constant and the matter density enter the simulation through <code>physical_units</code> in <code>engine/cosmology.py</code>, which returns the units \(L_0\) and \(T_0\). The class <code>MPISchrodingerPoisson</code> in <code>engine/simulation.py</code> converts the box size to simulation units, evaluates the expansion rate with \(\Omega_{\Lambda 0}\) in its method <code>da_dtau</code> and advances the scale factor in <code>advance_a</code>. The initial redshift fixes the starting scale factor of the root level in <code>engine/parallel/level.py</code>. The power spectrum is sampled in <code>wavefunction_ic</code> in <code>engine/grids.py</code> and in its distributed counterpart <code>MPILevel._generate_ic</code>, and the growth rate that sets the phase of \(\psi\) is computed in <code>velocities_cosmo</code> in <code>engine/cosmology.py</code>. The virial overdensity is defined in the class <code>Units</code> in <code>engine/halos.py</code>.</p>
 
       <p>The initial conditions are generated in four stages. The Boltzmann code CLASS [9] computes the CDM power spectrum at z = 1000. This spectrum is multiplied by the square of the wave dark matter transfer function of Hu, Barkana and Gruzinov [3], given in eq. 16. A Gaussian random field with the resulting spectrum is then drawn on the grid, and the wavefunction is constructed from this field with eq. 17.</p>
       <p>At the initial redshift wave dark matter differs from CDM through a cutoff in the power spectrum near the Jeans scale at matter–radiation equality. The cutoff is described by the transfer function [3]</p>
@@ -329,7 +333,7 @@ denom = 1.0 + 6.0 * alpha
 
   <div class="row">
     <div class="body">
-      <p>The conversion to physical units takes place at output. The class <code>halos.Units</code> converts code densities to \(M_\odot\,\mathrm{pc}^{-3}\) and cells to proper kpc at the current \(a\). It also computes the virial overdensity of Bryan and Norman [4], and cores are fitted with the soliton profile of Schive et al. [1].</p>
+      <p>The conversion to physical units takes place at output. The class <code>halos.Units</code> converts code densities to \(M_\odot\,\mathrm{pc}^{-3}\) and cells to proper kpc at the current \(a\). It also computes the virial overdensity of Bryan and Norman [4], and cores are fitted with the soliton profile in [1].</p>
       <div class="eq"><span class="tag">eq. 18</span>
         \[ \Delta_c = 18\pi^2 + 82x - 39x^2, \quad x = \Omega_m(z)-1, \qquad
            \rho_{\rm sol}(r) = \frac{\rho_c}{\big[1+0.091\,(r/r_c)^2\big]^8} . \]
@@ -355,7 +359,7 @@ denom = 1.0 + 6.0 * alpha
   <div class="row wide">
     <div class="body">
       <figure>
-        <img src="figures/soliton_profile.svg" alt="Radial density profile of the formed core with Schive fit and rescaled ground state overlapping to r of about 3, followed by a power-law envelope" width="707" height="462" loading="lazy">
+        <img src="figures/soliton_profile.svg" alt="Radial density profile of the formed core with solitonic fit and rescaled ground state overlapping to r of about 3, followed by a power-law envelope" width="707" height="462" loading="lazy">
         <figcaption class="caption"><span class="n">Fig. 3</span><span>Density profile at \(t=120\). The grey band is the independent ground state rescaled to the same \(\rho_c\) with eq. 6, without fitting. Beyond about \(3\,r_c\) the profile follows an envelope with logarithmic slope −2.5.</span></figcaption>
       </figure>
 
@@ -381,7 +385,7 @@ denom = 1.0 + 6.0 * alpha
       <div class="table-wrap"><table>
         <thead><tr><th>Quantity</th><th>Value</th></tr></thead>
         <tbody>
-          <tr><td>median rms deviation of the core from the Schive profile</td><td class="num">0.055</td></tr>
+          <tr><td>median rms deviation of the core from the soliton profile</td><td class="num">0.055</td></tr>
           <tr><td>late-time deviation of \(r_c\) from the ground-state invariant</td><td class="num">4.9%</td></tr>
           <tr><td>core radius of the reference ground state</td><td class="num">6.0 cells</td></tr>
           <tr><td>smallest core radius of the formed soliton</td><td class="num">4.4 cells</td></tr>
