@@ -82,18 +82,6 @@ mkdir <slug> && $EDITOR <slug>/index.md
 python3 build.py <slug>        # or let the Action do it on push
 ```
 
-The front matter carries what the page needs outside the prose.
-
-```
----
-title: On frames of reference
-year: 2024 - 2025
-description: one or two sentences, for search results and link previews
-summary: the shorter blurb the landing page carries, which is not the lede
-updated: 17th of September 2026
----
-```
-
 `summary` is separate from the lede on purpose. The landing page is curated
 and its blurbs are shorter than the openings of the entries they point at.
 An entry without a `summary` is built but is not listed, and the landing
@@ -141,8 +129,6 @@ pdftoppm -png -r 200 -singlefile figure1.pdf <slug>/figures/figure1
 ## Before pushing
 
 - Check the page at 1280 px and at 400 px.
-- Confirm `og:image` is an absolute URL. Relative ones do not resolve in link
-  previews.
-- Confirm the footer date.
+- Confirm `og:image` is an absolute URL. Relative ones do not resolve in link previews.
 - Open the page with JavaScript disabled once. Everything except the
   mathematics should still read.
